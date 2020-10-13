@@ -44,7 +44,7 @@ def setLedColor(sessionId, deviceId, ledColorCode):
 
 def turnOnOffLed(sessionId, moduleId, mode, ledEnabled):
     qString = MUTATION_ENABLE_LED
-    qVariables = '{"moduleId":"'+moduleId+'","mode":"'+mode+'","ledEnabled":'+str(ledEnabled).lower()+'}'
+    qVariables = '{"input": {"moduleId":"'+moduleId+'","mode":"'+mode+'","ledEnabled":'+str(ledEnabled).lower()+'}}'
     response = mutation(sessionId, qString, qVariables)
     return response
 

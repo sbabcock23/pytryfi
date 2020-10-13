@@ -1,3 +1,5 @@
+import datetime
+
 class FiDevice(object):
     def __init__(self, deviceId):
         self._deviceId = deviceId
@@ -5,18 +7,18 @@ class FiDevice(object):
     def setDeviceDetailsJSON(self, deviceJSON):
         self._moduleId = deviceJSON['moduleId']
         self._buildId = deviceJSON['info']['buildId']
-        self._batteryPercent = deviceJSON['info']['batteryPercent']
-        self._isCharging = deviceJSON['info']['isCharging']
+        self._batteryPercent = int(deviceJSON['info']['batteryPercent'])
+        self._isCharging = bool(deviceJSON['info']['isCharging'])
         self._batteryHealth = deviceJSON['info']['batteryHealth']
-        self._ledOn = deviceJSON['operationParams']['ledEnabled']
+        self._ledOn = bool(deviceJSON['operationParams']['ledEnabled'])
         self._ledOffAt = deviceJSON['operationParams']['ledOffAt']
         self._ledColor = deviceJSON['ledColor']['name']
         self._ledColorHex = deviceJSON['ledColor']['hexCode']
-        self._connectionStateDate = deviceJSON['lastConnectionState']['date']
+        self._connectionStateDate = datetime.datetime.fromisoformat(str(deviceJSON['lastConnectionState']['date']).replace('Z', '+00:00'))
         self._connectionStateType = deviceJSON['lastConnectionState']['__typename']
 
     def __str__(self):
-        return f"Device ID: {self.deviceId} Battery Left: {self.batteryPercent} LED State: {self.ledOn} Last Connected: {self.connectionStateDate} by: {self.connectionStateType}"
+        return f"Device ID: {self.deviceId} Battery Left: {self.batteryPercent}% LED State: {self.ledOn} Last Connected: {self.connectionStateDate} by: {self.connectionStateType}"
 
 
     @property

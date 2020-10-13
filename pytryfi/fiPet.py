@@ -1,6 +1,7 @@
 import logging
 from pytryfi.fiDevice import FiDevice
 from pytryfi.common import query
+import datetime
 
 LOGGER = logging.getLogger(__name__)
 
@@ -11,14 +12,13 @@ class FiPet(object):
     def setPetDetailsJSON(self, petJSON):
         self._name = petJSON['name']
         self._homeCityState = petJSON['homeCityState']
-        self._yearOfBirth = petJSON['yearOfBirth']
-        self._monthOfBirth = petJSON['monthOfBirth']
-        self._dayOfBirth = petJSON['dayOfBirth']
+        self._yearOfBirth = int(petJSON['yearOfBirth'])
+        self._monthOfBirth = int(petJSON['monthOfBirth'])
+        self._dayOfBirth = int(petJSON['dayOfBirth'])
         self._gender = petJSON['gender']
         #weight is in kg
-        self._weight = petJSON['weight']
+        self._weight = float(petJSON['weight'])
         self._breed = petJSON['breed']['name']
-        #TOFIx need to add try catch 
         try:
             self._photoLink = petJSON['photos']['first']['image']['fullSize']
         except:
@@ -33,29 +33,43 @@ class FiPet(object):
             using Device/Collar: {self._device}"
     
     def setCurrentLocation(self, activityJSON):
-        self._currLongitude = activityJSON['position']['longitude']
-        self._currLatitude = activityJSON['position']['latitude']
-        self._currStartTime = activityJSON['start']
+        self._currLongitude = float(activityJSON['position']['longitude'])
+        self._currLatitude = float(activityJSON['position']['latitude'])
+        self._currStartTime = datetime.datetime.fromisoformat(activityJSON['start'].replace('Z', '+00:00'))
         self._currPlaceName = activityJSON['place']['name']
         self._currPlaceAddress = activityJSON['place']['address']
 
     def setStats(self, activityJSONDaily, activityJSONWeekly, activityJSONMonthly):
         #distance is in metres
-        self._dailyGoal = activityJSONDaily['stepGoal']
-        self._dailySteps = activityJSONDaily['totalSteps']
-        self._dailyTotalDistance = activityJSONDaily['totalDistance']
+        self._dailyGoal = int(activityJSONDaily['stepGoal'])
+        self._dailySteps = int(activityJSONDaily['totalSteps'])
+        self._dailyTotalDistance = float(activityJSONDaily['totalDistance'])
 
-        self._WeeklyGoal = activityJSONWeekly['stepGoal']
-        self._WeeklySteps = activityJSONWeekly['totalSteps']
-        self._WeeklyTotalDistance = activityJSONWeekly['totalDistance']
+        self._weeklyGoal = int(activityJSONWeekly['stepGoal'])
+        self._weeklySteps = int(activityJSONWeekly['totalSteps'])
+        self._weeklyTotalDistance = float(activityJSONWeekly['totalDistance'])
 
-        self._MonthlyGoal = activityJSONMonthly['stepGoal']
-        self._MonthlySteps = activityJSONMonthly['totalSteps']
-        self._MonthlyTotalDistance = activityJSONMonthly['totalDistance']
+        self._monthlyGoal = int(activityJSONMonthly['stepGoal'])
+        self._monthlySteps = int(activityJSONMonthly['totalSteps'])
+        self._monthlyTotalDistance = float(activityJSONMonthly['totalDistance'])
 
-    def updatePetLocation(self, sessionId,):
-        pLocJSON = query.getCurrentPetLocation(sessionId,self.petId)
-        self.setCurrentLocation(pLocJSON)
+    def updateStats(self, sessionId):
+        try:
+            pStatsJSON = query.getCurrentPetStats(sessionId,self.petId)
+            self.setStats(pStatsJSON['dailyStat'],pStatsJSON['weeklyStat'],pStatsJSON['monthlyStat'])
+            return True
+
+        except Exception as e:
+            LOGGER.error(f"Could not update stats for Pet {self.name}.\n{e}")
+
+    def updatePetLocation(self, sessionId):
+        try:
+            pLocJSON = query.getCurrentPetLocation(sessionId,self.petId)
+            self.setCurrentLocation(pLocJSON)
+            return True
+        except Exception as e:
+            LOGGER.error(f"Could not update Pet: {self.name}'s location.\n{e}")
+            return False
 
     def setLedColorCode(self, sessionId, colorCode):
         try:
@@ -64,7 +78,7 @@ class FiPet(object):
             query.setLedColor(sessionId, moduleId, ledColorCode)
             return True
         except Exception as e:
-            LOGGER.warning(f"Could not complete request:\m {e}")
+            LOGGER.error(f"Could not complete request:\n{e}")
             return False
     
     def turnOnOffLed(self, sessionId, action):
@@ -78,7 +92,7 @@ class FiPet(object):
             query.turnOnOffLed(sessionId, moduleId, mode, ledEnabled)
             return True
         except Exception as e:
-            LOGGER.warning(f"Could not complete request:\m {e}")
+            LOGGER.error(f"Could not complete request:\n{e}")
             return False
 
     @property
@@ -159,3 +173,34 @@ class FiPet(object):
     @property
     def monthlyTotalDistance(self):
         return self._monthlyTotalDistance
+    
+    def getBirthDate(self):
+        return datetime.datetime(self.yearOfBirth, self.monthOfBirth, self.dayOfBirth)
+    
+    def getDailySteps(self):
+        return self.dailySteps
+    
+    def getDailyGoal(self):
+        return self.dailyGoal
+
+    def getDailyDistance(self):
+        return self.dailyTotalDistance
+
+    def getWeeklySteps(self):
+        return self.weeklySteps
+    
+    def getWeeklyGoal(self):
+        return self.weeklyGoal
+
+    def getWeeklyDistance(self):
+        return self.weeklyTotalDistance
+
+    def getMonthlySteps(self):
+        return self.monthlySteps
+    
+    def getMonthlyGoal(self):
+        return self.monthlyGoal
+
+    def getMonthlyDistance(self):
+        return self.monthlyTotalDistance
+        
