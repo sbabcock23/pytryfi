@@ -47,7 +47,7 @@ tryfi.pets[0].turnOnOffLed(tryfi.session,"OFF")
 ## 0.0.2
 Initial version of the TryFi interface that gathered basic information about the pets, collars and bases.
 
-##0.0.3
+## 0.0.3
 The following updates/enhancements were made:
 * moved updated pet location from base object to pet class
 * created function to update the stats of the pet
