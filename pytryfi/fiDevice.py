@@ -1,4 +1,5 @@
 import datetime
+from pytryfi.ledColors import ledColors
 
 class FiDevice(object):
     def __init__(self, deviceId):
@@ -16,6 +17,10 @@ class FiDevice(object):
         self._ledColorHex = deviceJSON['ledColor']['hexCode']
         self._connectionStateDate = datetime.datetime.fromisoformat(str(deviceJSON['lastConnectionState']['date']).replace('Z', '+00:00'))
         self._connectionStateType = deviceJSON['lastConnectionState']['__typename']
+        self._availableLedColors = []
+        for cString in deviceJSON['availableLedColors']:
+            c = ledColors(int(cString['ledColorCode']),cString['hexCode'], cString['name'] )
+            self._availableLedColors.append(c)
 
     def __str__(self):
         return f"Device ID: {self.deviceId} Battery Left: {self.batteryPercent}% LED State: {self.ledOn} Last Connected: {self.connectionStateDate} by: {self.connectionStateType}"
@@ -57,4 +62,6 @@ class FiDevice(object):
     @property
     def connectionStateType(self):
         return self._connectionStateType
-        
+    @property
+    def availableLedColors(self):
+        return self._availableLedColors
