@@ -37,13 +37,13 @@ def getCurrentPetStats(sessionId, petId):
     return response['data']['pet']
 
 def setLedColor(sessionId, deviceId, ledColorCode):
-    qString = MUTATION_SET_LED_COLOR
+    qString = MUTATION_SET_LED_COLOR + FRAGMENT_DEVICE_DETAILS + FRAGMENT_OPERATIONAL_DETAILS + FRAGMENT_CONNECTION_STATE_DETAILS + FRAGMENT_USER_DETAILS + FRAGMENT_LED_DETAILS
     qVariables = '{"moduleId":"'+deviceId+'","ledColorCode":'+str(ledColorCode)+'}'
     response = mutation(sessionId, qString, qVariables)
     return response
 
 def turnOnOffLed(sessionId, moduleId, mode, ledEnabled):
-    qString = MUTATION_ENABLE_LED
+    qString = MUTATION_ENABLE_LED + FRAGMENT_DEVICE_DETAILS + FRAGMENT_OPERATIONAL_DETAILS + FRAGMENT_CONNECTION_STATE_DETAILS + FRAGMENT_USER_DETAILS + FRAGMENT_LED_DETAILS
     qVariables = '{"input": {"moduleId":"'+moduleId+'","mode":"'+mode+'","ledEnabled":'+str(ledEnabled).lower()+'}}'
     response = mutation(sessionId, qString, qVariables)
     return response
