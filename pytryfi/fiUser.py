@@ -1,0 +1,35 @@
+from pytryfi.common import query
+
+class FiUser(object):
+    def __init__(self, userId):
+        self._userId = userId
+        
+    def setUserDetails(self, sessionId):
+        response = query.getUserDetail(sessionId)
+        self._email = response['email']
+        self._firstName = response['firstName']
+        self._lastName = response['lastName']
+        self._phoneNumber = response['phoneNumber']
+
+    def __str__(self):
+        return f"User ID: {self.userId} Name: {self.fullName} Email: {self.email}"
+        
+    @property
+    def userId(self):
+        return self._userId
+    @property
+    def email(self):
+        return self._email
+    @property
+    def firstName(self):
+        return self._firstName
+    @property
+    def lastName(self):
+        return self._lastName
+    @property
+    def phoneNumber(self):
+        return self._phoneNumber
+    @property
+    def fullName(self):
+        return self.firstName + " "  + self.lastName
+    
