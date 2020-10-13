@@ -16,7 +16,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name="pytryfi", # Replace with your own username
-    version="0.0.2",
+    version="0.0.3",
     author="Steve Babcock",
     author_email="steve.w.babcock@gmail.com",
     description="Python Interface for TryFi Dog Collars",
