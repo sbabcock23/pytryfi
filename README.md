@@ -44,9 +44,6 @@ tryfi.pets[0].turnOnOffLed(tryfi.session,"OFF")
 * [TryFi](https://tryfi.com/)
 
 # Version History
-## 0.0.2
-Initial version of the TryFi interface that gathered basic information about the pets, collars and bases.
-
 ## 0.0.3
 The following updates/enhancements were made:
 * moved updated pet location from base object to pet class
@@ -54,3 +51,6 @@ The following updates/enhancements were made:
 * converted approriate variables to integers, floats and dates
 * created function to set the LED color on the collar
 * created function to turn on/off LED on a collar
+
+## 0.0.2
+Initial version of the TryFi interface that gathered basic information about the pets, collars and bases.
