@@ -25,7 +25,6 @@ class FiDevice(object):
     def __str__(self):
         return f"Device ID: {self.deviceId} Battery Left: {self.batteryPercent}% LED State: {self.ledOn} Last Connected: {self.connectionStateDate} by: {self.connectionStateType}"
 
-
     @property
     def deviceId(self):
         return self._deviceId

@@ -36,17 +36,22 @@ def getCurrentPetStats(sessionId, petId):
     response = query(sessionId, qString)
     return response['data']['pet']
 
+def getDevicedetails(sessionId, petId):
+    qString = QUERY_PET_DEVICE_DETAILS.replace(VAR_PET_ID, petId) + FRAGMENT_PET_PROFILE + FRAGEMENT_BASE_PET_PROFILE + FRAGMENT_DEVICE_DETAILS + FRAGMENT_LED_DETAILS + FRAGMENT_OPERATIONAL_DETAILS + FRAGMENT_CONNECTION_STATE_DETAILS + FRAGMENT_USER_DETAILS + FRAGMENT_BREED_DETAILS + FRAGMENT_PHOTO_DETAILS
+    response = query(sessionId, qString)
+    return response['data']['pet']
+
 def setLedColor(sessionId, deviceId, ledColorCode):
     qString = MUTATION_SET_LED_COLOR + FRAGMENT_DEVICE_DETAILS + FRAGMENT_OPERATIONAL_DETAILS + FRAGMENT_CONNECTION_STATE_DETAILS + FRAGMENT_USER_DETAILS + FRAGMENT_LED_DETAILS
     qVariables = '{"moduleId":"'+deviceId+'","ledColorCode":'+str(ledColorCode)+'}'
     response = mutation(sessionId, qString, qVariables)
-    return response
+    return response['data']
 
 def turnOnOffLed(sessionId, moduleId, mode, ledEnabled):
     qString = MUTATION_ENABLE_LED + FRAGMENT_DEVICE_DETAILS + FRAGMENT_OPERATIONAL_DETAILS + FRAGMENT_CONNECTION_STATE_DETAILS + FRAGMENT_USER_DETAILS + FRAGMENT_LED_DETAILS
     qVariables = '{"input": {"moduleId":"'+moduleId+'","mode":"'+mode+'","ledEnabled":'+str(ledEnabled).lower()+'}}'
     response = mutation(sessionId, qString, qVariables)
-    return response
+    return response['data']
 
 def getGraphqlURL():
     return API_HOST_URL_BASE + API_GRAPHQL

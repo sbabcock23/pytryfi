@@ -57,7 +57,7 @@ class PyTryFi(object):
             petString = petString + f"{p}"
         return f"TryFi Instance - {instString}\n Pets in Home:\n {petString}\n Bases In Home:\n {baseString}"
         
-    #refresh pet details
+    #refresh pet details for all pets
     def updatePets(self):
         petListJSON = query.getPetList(self._session)
         updatedPets = []
@@ -85,12 +85,13 @@ class PyTryFi(object):
                 break
             count = count + 1
 
+    # return the pet object based on petId
     def getPet(self, petId):
         for p in self.pets:
             if petId == p.petId:
                 return p
         LOGGER.error(f"Cannot find Pet: {petId}")
-        return
+        return None
     
     #refresh base details
     def updateBases(self):
@@ -127,6 +128,7 @@ class PyTryFi(object):
     def session(self):
         return self._session
 
+    # login to the api and get a session
     def login(self):
         url = API_HOST_URL_BASE + API_LOGIN
         params={

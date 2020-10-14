@@ -8,6 +8,7 @@ QUERY_CURRENT_USER  = "query {\n  currentUser {\n    ...UserDetails\n  }\n}\n"
 QUERY_CURRENT_USER_FULL_DETAIL  = "query {\n  currentUser {\n    ...UserFullDetails\n  }\n}\n"
 QUERY_PET_CURRENT_LOCATION = "query {\n\n  pet (id: \""+VAR_PET_ID+"\") {\n    ongoingActivity(walksVersion: 1) {\n      __typename\n      ...OngoingActivityDetails\n    }\n  }\n}\n"
 QUERY_PET_ACTIVITY = "query {\n\n  pet (id: \""+VAR_PET_ID+"\") {\n   \n    dailyStat: currentActivitySummary (period: DAILY) {\n      ...ActivitySummaryDetails\n    }\n    weeklyStat: currentActivitySummary (period: WEEKLY) {\n      ...ActivitySummaryDetails\n    }\n    monthlyStat: currentActivitySummary (period: MONTHLY) {\n      ...ActivitySummaryDetails\n    }\n  }\n}\n"
+QUERY_PET_DEVICE_DETAILS = "query {\n  pet (id: \""+VAR_PET_ID+"\") {\n    __typename\n    ...PetProfile\n  }\n}\n"
 
 FRAGMENT_USER_DETAILS = "fragment UserDetails on User {\n  __typename\n   id\n  email\n  firstName\n  lastName\n  phoneNumber\n  fiNewsNotificationsEnabled\n  chipReseller {\n    __typename\n    id\n  }\n}\n"
 FRAGMENT_USER_FULL_DETAILS = "fragment UserFullDetails on User {\n  __typename\n  ...UserDetails\n  userHouseholds {\n    __typename\n    household {\n      __typename\n      pets {\n        __typename\n        ...PetProfile\n      }\n      bases {\n        __typename\n        ...BaseDetails\n      }\n    }\n  }\n}\n"

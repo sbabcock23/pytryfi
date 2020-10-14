@@ -32,6 +32,7 @@ class FiPet(object):
         return f"Pet ID: {self.petId} Name: {self.name} From: {self.homeCityState} Located: {self.currLatitude},{self.currLongitude} Last Updated: {self.currStartTime}\n \
             using Device/Collar: {self._device}"
     
+    # set the Pet's current location details
     def setCurrentLocation(self, activityJSON):
         self._currLongitude = float(activityJSON['position']['longitude'])
         self._currLatitude = float(activityJSON['position']['latitude'])
@@ -39,6 +40,7 @@ class FiPet(object):
         self._currPlaceName = activityJSON['place']['name']
         self._currPlaceAddress = activityJSON['place']['address']
 
+    # set the Pet's current steps, goals and distance details for daily, weekly and monthly
     def setStats(self, activityJSONDaily, activityJSONWeekly, activityJSONMonthly):
         #distance is in metres
         self._dailyGoal = int(activityJSONDaily['stepGoal'])
@@ -53,6 +55,7 @@ class FiPet(object):
         self._monthlySteps = int(activityJSONMonthly['totalSteps'])
         self._monthlyTotalDistance = float(activityJSONMonthly['totalDistance'])
 
+    # Update the Stats of the pet
     def updateStats(self, sessionId):
         try:
             pStatsJSON = query.getCurrentPetStats(sessionId,self.petId)
@@ -62,6 +65,7 @@ class FiPet(object):
         except Exception as e:
             LOGGER.error(f"Could not update stats for Pet {self.name}.\n{e}")
 
+    # Update the Pet's GPS location
     def updatePetLocation(self, sessionId):
         try:
             pLocJSON = query.getCurrentPetLocation(sessionId,self.petId)
@@ -70,26 +74,52 @@ class FiPet(object):
         except Exception as e:
             LOGGER.error(f"Could not update Pet: {self.name}'s location.\n{e}")
             return False
+    
+    # Update the device/collar details for this pet
+    def updateDeviceDetails(self, sessionId):
+        try:
+            deviceJSON = query.getDevicedetails(sessionId, self.petId)
+            self.device.setDeviceDetailsJSON(deviceJSON['device'])
+            return True
+        except Exception as e:
+            LOGGER.error(f"Could not update Device/Collar information for Pet: {self.name}\n{e}")
+            return False
 
+    # Update all details regarding this pet
+    def updateAllDetails(self, sessionId):
+        self.updateDeviceDetails(sessionId)
+        self.updatePetLocation(sessionId)
+        sel
+
+    # set the color code of the led light on the pet collar
     def setLedColorCode(self, sessionId, colorCode):
         try:
             moduleId = self.device.moduleId
             ledColorCode = int(colorCode)
-            query.setLedColor(sessionId, moduleId, ledColorCode)
+            setColorJSON = query.setLedColor(sessionId, moduleId, ledColorCode)
+            try:
+                self.device.setDeviceDetailsJSON(setColorJSON['setDeviceLed'])
+            except Exception as e:
+                LOGGER.warning(f"Updated LED Color but could not get current status for Pet: {self.name}")
             return True
         except Exception as e:
             LOGGER.error(f"Could not complete request:\n{e}")
             return False
     
+    # turn on or off the led light. action = True will enable the light, false turns off the light
     def turnOnOffLed(self, sessionId, action):
         try:
             moduleId = self.device.moduleId
             mode = "NORMAL"
-            if action.upper() == "ON":
+            if action:
                 ledEnabled = True
             else:
                 ledEnabled = False
-            query.turnOnOffLed(sessionId, moduleId, mode, ledEnabled)
+            onOffResponse = query.turnOnOffLed(sessionId, moduleId, mode, ledEnabled)
+            try:
+                self.device.setDeviceDetailsJSON(onOffResponse['updateDeviceOperationParams'])
+            except Exception as e:
+                LOGGER.warning(f"Action: {action} was successful however unable to get current status for Pet: {self.name}")
             return True
         except Exception as e:
             LOGGER.error(f"Could not complete request:\n{e}")
