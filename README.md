@@ -27,6 +27,12 @@ tryfi.pets[0].updatePetLocation(tryfi.session)
 #this will update the stats of the pet 
 tryfi.pets[0].updateStats(tryfi.session)
 
+#update the device/collar details for the given pet
+tryfi.pets[0].updateDeviceDetails(tryfi.session)
+
+#update the all details for a given pet
+tryfi.pets[0].updateAllDetails(tryfi.session)
+
 #this will set the light color of the collar
 tryfi.pets[0].setLedColorCode(tryfi.session, 2)
 
@@ -44,6 +50,12 @@ tryfi.pets[0].turnOnOffLed(tryfi.session,"OFF")
 * [TryFi](https://tryfi.com/)
 
 # Version History
+## 0.0.4
+* created update functions for various pet and device objects and a global update for the pet
+* added last updated date/time to the objects to track when the data was last updated
+* changed turn on/off action to boolean
+* when performing an action on the collar, update the data that is retrieved at the same time
+
 ## 0.0.3
 The following updates/enhancements were made:
 * moved updated pet location from base object to pet class
