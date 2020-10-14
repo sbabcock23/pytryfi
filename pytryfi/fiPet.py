@@ -19,6 +19,8 @@ class FiPet(object):
         #weight is in kg
         self._weight = float(petJSON['weight'])
         self._breed = petJSON['breed']['name']
+        #track last updated
+        self._lastUpdated = datetime.datetime.now()
         try:
             self._photoLink = petJSON['photos']['first']['image']['fullSize']
         except:
@@ -29,7 +31,7 @@ class FiPet(object):
         self._device.setDeviceDetailsJSON(petJSON['device'])
 
     def __str__(self):
-        return f"Pet ID: {self.petId} Name: {self.name} From: {self.homeCityState} Located: {self.currLatitude},{self.currLongitude} Last Updated: {self.currStartTime}\n \
+        return f"Last Updated - {self.lastUpdated} - Pet ID: {self.petId} Name: {self.name} From: {self.homeCityState} Located: {self.currLatitude},{self.currLongitude} Last Updated: {self.currStartTime}\n \
             using Device/Collar: {self._device}"
     
     # set the Pet's current location details
@@ -39,6 +41,7 @@ class FiPet(object):
         self._currStartTime = datetime.datetime.fromisoformat(activityJSON['start'].replace('Z', '+00:00'))
         self._currPlaceName = activityJSON['place']['name']
         self._currPlaceAddress = activityJSON['place']['address']
+        self._lastUpdated = datetime.datetime.now()
 
     # set the Pet's current steps, goals and distance details for daily, weekly and monthly
     def setStats(self, activityJSONDaily, activityJSONWeekly, activityJSONMonthly):
@@ -54,6 +57,8 @@ class FiPet(object):
         self._monthlyGoal = int(activityJSONMonthly['stepGoal'])
         self._monthlySteps = int(activityJSONMonthly['totalSteps'])
         self._monthlyTotalDistance = float(activityJSONMonthly['totalDistance'])
+
+        self._lastUpdated = datetime.datetime.now()
 
     # Update the Stats of the pet
     def updateStats(self, sessionId):
@@ -89,7 +94,7 @@ class FiPet(object):
     def updateAllDetails(self, sessionId):
         self.updateDeviceDetails(sessionId)
         self.updatePetLocation(sessionId)
-        sel
+        self.updateStats(sessionId)
 
     # set the color code of the led light on the pet collar
     def setLedColorCode(self, sessionId, colorCode):
@@ -203,7 +208,9 @@ class FiPet(object):
     @property
     def monthlyTotalDistance(self):
         return self._monthlyTotalDistance
-    
+    @property
+    def lastUpdated(self):
+        return self._lastUpdated
     def getBirthDate(self):
         return datetime.datetime(self.yearOfBirth, self.monthOfBirth, self.dayOfBirth)
     

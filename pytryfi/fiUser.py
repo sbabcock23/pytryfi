@@ -1,4 +1,5 @@
 from pytryfi.common import query
+import datetime
 
 class FiUser(object):
     def __init__(self, userId):
@@ -10,6 +11,7 @@ class FiUser(object):
         self._firstName = response['firstName']
         self._lastName = response['lastName']
         self._phoneNumber = response['phoneNumber']
+        self._lastUpdated = datetime.datetime.now()
 
     def __str__(self):
         return f"User ID: {self.userId} Name: {self.fullName} Email: {self.email}"
@@ -32,4 +34,7 @@ class FiUser(object):
     @property
     def fullName(self):
         return self.firstName + " "  + self.lastName
+    @property
+    def lastUpdated(self):
+        return self._lastUpdated
     

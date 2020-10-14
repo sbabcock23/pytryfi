@@ -1,3 +1,4 @@
+import datetime
 
 class FiBase(object):
     def __init__(self, baseId):
@@ -11,9 +12,10 @@ class FiBase(object):
         self._onlineQuality = baseJSON['onlineQuality']
         self._lastUpdated = baseJSON['infoLastUpdated']
         self._networkName = baseJSON['networkName']
+        self._lastUpdated = datetime.datetime.now()
 
     def __str__(self):
-        return f"Base ID: {self.baseId} Name: {self.name} Online Status: {self.online} Wifi Network: {self.networkname} Located: {self.latitude},{self.longitude}"
+        return f"Last Updated - {self.lastUpdated} - Base ID: {self.baseId} Name: {self.name} Online Status: {self.online} Wifi Network: {self.networkname} Located: {self.latitude},{self.longitude}"
         
     @property
     def baseId(self):
@@ -39,3 +41,6 @@ class FiBase(object):
     @property
     def networkname(self):
         return self._networkName
+    @property
+    def lastUpdated(self):
+        return self._lastUpdated

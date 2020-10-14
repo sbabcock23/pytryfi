@@ -102,6 +102,10 @@ class PyTryFi(object):
             b.setBaseDetailsJSON(base)
             updatedBases.append(b)
         self._bases = updatedBases
+    
+    def update(self):
+        self.updateBases()
+        self.updatePets()
 
     @property
     def currentUser(self):
