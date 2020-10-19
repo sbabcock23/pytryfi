@@ -102,7 +102,15 @@ class PyTryFi(object):
             b.setBaseDetailsJSON(base)
             updatedBases.append(b)
         self._bases = updatedBases
-    
+
+    # return the pet object based on petId
+    def getBase(self, baseId):
+        for b in self.bases:
+            if baseId == b.baseId:
+                return b
+        LOGGER.error(f"Cannot find Base: {baseId}")
+        return None
+
     def update(self):
         self.updateBases()
         self.updatePets()
