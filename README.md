@@ -21,6 +21,9 @@ tryfi.updatePets()
 #this will perform a complete refresh of all Bases and data points
 tryfi.updateBases()
 
+#this will perform an update on both Pets and Bases and their associated data points
+tryfi.update()
+
 #this will update the last reported location of a bet
 tryfi.pets[0].updatePetLocation(tryfi.session)
 
@@ -50,6 +53,10 @@ tryfi.pets[0].turnOnOffLed(tryfi.session,"OFF")
 * [TryFi](https://tryfi.com/)
 
 # Version History
+## 0.0.5
+* Added global update function that updates both pets and bases (pytryfi.update())
+* Added better error handling
+
 ## 0.0.4
 * created update functions for various pet and device objects and a global update for the pet
 * added last updated date/time to the objects to track when the data was last updated
