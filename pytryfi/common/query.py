@@ -1,4 +1,5 @@
 from pytryfi.const import *
+from pytryfi.exceptions import *
 import requests
 
 def getUserDetail(sessionId):
@@ -72,11 +73,14 @@ def query(sessionId, qString):
 
 def execute(url, sessionId, method='GET', params=None, cookies=None):
     response = None
-    if method == 'GET':
-        response = sessionId.get(url, params=params)
-    elif method == 'POST':
-        response = sessionId.post(url, data=params)
-    else:
-        return None
+    try:
+        if method == 'GET':
+            response = sessionId.get(url, params=params)
+        elif method == 'POST':
+            response = sessionId.post(url, data=params)
+        else:
+            raise TryFiError(f"Method Passed was invalid: {method}")
+    except requests.RequestException as e:
+        raise requests.RequestException(e)
     return response
     
