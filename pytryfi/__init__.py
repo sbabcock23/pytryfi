@@ -149,8 +149,12 @@ class PyTryFi(object):
             }
         
         LOGGER.debug(f"Logging into TryFi")
-        
-        response = self._session.post(url, data=params)
+        try:
+            response = self._session.post(url, data=params)
+            response.raise_for_status()
+        except requests.RequestException as e:
+            LOGGER.error(f"Cannot login, response: ({response.status_code})")
+            raise requests.RequestException(e)
         error = None
         try:
             error = response.json()['error']
@@ -159,6 +163,7 @@ class PyTryFi(object):
         if error or not response.ok:
             errorMsg = error['message']
             LOGGER.error(f"Cannot login, response: ({response.status_code}): {errorMsg} ")
+            raise Exception("TryFiLoginError")
         #storing cookies but don't need them. Handled by session mgmt
         self._cookies = response.cookies
         #store unique userId from login for future use
