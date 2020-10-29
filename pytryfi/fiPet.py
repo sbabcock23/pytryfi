@@ -1,6 +1,7 @@
 import logging
 from pytryfi.fiDevice import FiDevice
 from pytryfi.common import query
+from pytryfi.exceptions import *
 import datetime
 
 LOGGER = logging.getLogger(__name__)
@@ -10,17 +11,21 @@ class FiPet(object):
         self._petId = petId
 
     def setPetDetailsJSON(self, petJSON):
-        self._name = petJSON['name']
-        self._homeCityState = petJSON['homeCityState']
-        self._yearOfBirth = int(petJSON['yearOfBirth'])
-        self._monthOfBirth = int(petJSON['monthOfBirth'])
-        self._dayOfBirth = int(petJSON['dayOfBirth'])
-        self._gender = petJSON['gender']
-        #weight is in kg
-        self._weight = float(petJSON['weight'])
-        self._breed = petJSON['breed']['name']
-        #track last updated
-        self._lastUpdated = datetime.datetime.now()
+        try:
+            self._name = petJSON['name']
+            self._homeCityState = petJSON['homeCityState']
+            self._yearOfBirth = int(petJSON['yearOfBirth'])
+            self._monthOfBirth = int(petJSON['monthOfBirth'])
+            self._dayOfBirth = int(petJSON['dayOfBirth'])
+            self._gender = petJSON['gender']
+            #weight is in kg
+            self._weight = float(petJSON['weight'])
+            self._breed = petJSON['breed']['name']
+            #track last updated
+            self._lastUpdated = datetime.datetime.now()
+        except TryFiError as e:
+            LOGGER.error(f"Unable to set values for Pet.\nException: {e}\nwhile parsing {petJSON}")
+            raise TryFiError("Unable to set Pet Details")
         try:
             self._photoLink = petJSON['photos']['first']['image']['fullSize']
         except:
@@ -36,29 +41,44 @@ class FiPet(object):
     
     # set the Pet's current location details
     def setCurrentLocation(self, activityJSON):
-        self._currLongitude = float(activityJSON['position']['longitude'])
-        self._currLatitude = float(activityJSON['position']['latitude'])
-        self._currStartTime = datetime.datetime.fromisoformat(activityJSON['start'].replace('Z', '+00:00'))
-        self._currPlaceName = activityJSON['place']['name']
-        self._currPlaceAddress = activityJSON['place']['address']
-        self._lastUpdated = datetime.datetime.now()
+        try:
+            self._currLongitude = float(activityJSON['position']['longitude'])
+            self._currLatitude = float(activityJSON['position']['latitude'])
+            self._currStartTime = datetime.datetime.fromisoformat(activityJSON['start'].replace('Z', '+00:00'))
+            self._currPlaceName = activityJSON['place']['name']
+            self._currPlaceAddress = activityJSON['place']['address']
+            self._lastUpdated = datetime.datetime.now()
+        except TryFiError as e:
+            LOGGER.error(f"Unable to set values Current Location for Pet {self.name}.\nException: {e}\nwhile parsing {activityJSON}")
+            raise TryFiError("Unable to set Pet Location Details")
 
     # set the Pet's current steps, goals and distance details for daily, weekly and monthly
     def setStats(self, activityJSONDaily, activityJSONWeekly, activityJSONMonthly):
-        #distance is in metres
-        self._dailyGoal = int(activityJSONDaily['stepGoal'])
-        self._dailySteps = int(activityJSONDaily['totalSteps'])
-        self._dailyTotalDistance = float(activityJSONDaily['totalDistance'])
-
-        self._weeklyGoal = int(activityJSONWeekly['stepGoal'])
-        self._weeklySteps = int(activityJSONWeekly['totalSteps'])
-        self._weeklyTotalDistance = float(activityJSONWeekly['totalDistance'])
-
-        self._monthlyGoal = int(activityJSONMonthly['stepGoal'])
-        self._monthlySteps = int(activityJSONMonthly['totalSteps'])
-        self._monthlyTotalDistance = float(activityJSONMonthly['totalDistance'])
+        try:
+            #distance is in metres
+            self._dailyGoal = int(activityJSONDaily['stepGoal'])
+            self._dailySteps = int(activityJSONDaily['totalSteps'])
+            self._dailyTotalDistance = float(activityJSONDaily['totalDistance'])
+        except TryFiError as e:
+            LOGGER.error(f"Unable to set values Daily Stats for Pet {self.name}.\nException: {e}\nwhile parsing {activityJSONDaily}")
+            raise TryFiError("Unable to set Pet Daily Stats")
+        try:
+            self._weeklyGoal = int(activityJSONWeekly['stepGoal'])
+            self._weeklySteps = int(activityJSONWeekly['totalSteps'])
+            self._weeklyTotalDistance = float(activityJSONWeekly['totalDistance'])
+        except TryFiError as e:
+            LOGGER.error(f"Unable to set values Weekly Stats for Pet {self.name}.\nException: {e}\nwhile parsing {activityJSONWeekly}")
+            raise TryFiError("Unable to set Pet Weekly Stats")
+        try:
+            self._monthlyGoal = int(activityJSONMonthly['stepGoal'])
+            self._monthlySteps = int(activityJSONMonthly['totalSteps'])
+            self._monthlyTotalDistance = float(activityJSONMonthly['totalDistance'])
+        except TryFiError as e:
+            LOGGER.error(f"Unable to set values Monthly Stats for Pet {self.name}.\nException: {e}\nwhile parsing {activityJSONMonthly}")
+            raise TryFiError("Unable to set Pet Monthly Stats")
 
         self._lastUpdated = datetime.datetime.now()
+
 
     # Update the Stats of the pet
     def updateStats(self, sessionId):
@@ -66,7 +86,6 @@ class FiPet(object):
             pStatsJSON = query.getCurrentPetStats(sessionId,self.petId)
             self.setStats(pStatsJSON['dailyStat'],pStatsJSON['weeklyStat'],pStatsJSON['monthlyStat'])
             return True
-
         except Exception as e:
             LOGGER.error(f"Could not update stats for Pet {self.name}.\n{e}")
 
@@ -105,10 +124,10 @@ class FiPet(object):
             try:
                 self.device.setDeviceDetailsJSON(setColorJSON['setDeviceLed'])
             except Exception as e:
-                LOGGER.warning(f"Updated LED Color but could not get current status for Pet: {self.name}")
+                LOGGER.warning(f"Updated LED Color but could not get current status for Pet: {self.name}\nException: {e}")
             return True
         except Exception as e:
-            LOGGER.error(f"Could not complete request:\n{e}")
+            LOGGER.error(f"Could not complete Led Color request:\n{e}")
             return False
     
     # turn on or off the led light. action = True will enable the light, false turns off the light
@@ -137,6 +156,7 @@ class FiPet(object):
             return True
         except Exception as e:
             LOGGER.error(f"Could not complete Lost Dog Mode request:\n{e}")
+            LOGGER.error(f"Could not complete turn on/off light where ledEnable is {action}.\nException: {e}")
             return False
 
     @property
