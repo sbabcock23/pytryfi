@@ -220,6 +220,10 @@ class FiPet(object):
     @property
     def lastUpdated(self):
         return self._lastUpdated
+    @property
+    def isLost(self):
+        return self.device.isLost()
+    
     def getBirthDate(self):
         return datetime.datetime(self.yearOfBirth, self.monthOfBirth, self.dayOfBirth)
     

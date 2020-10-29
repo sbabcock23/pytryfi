@@ -1,5 +1,6 @@
 import datetime
 from pytryfi.ledColors import ledColors
+from pytryfi.const import PET_MODE_NORMAL, PET_MODE_LOST
 
 class FiDevice(object):
     def __init__(self, deviceId):
@@ -13,6 +14,7 @@ class FiDevice(object):
         self._batteryHealth = deviceJSON['info']['batteryHealth']
         self._ledOn = bool(deviceJSON['operationParams']['ledEnabled'])
         self._ledOffAt = deviceJSON['operationParams']['ledOffAt']
+        self._mode = deviceJSON['operationParams']['mode']
         self._ledColor = deviceJSON['ledColor']['name']
         self._ledColorHex = deviceJSON['ledColor']['hexCode']
         self._connectionStateDate = datetime.datetime.fromisoformat(str(deviceJSON['lastConnectionState']['date']).replace('Z', '+00:00'))
@@ -68,3 +70,9 @@ class FiDevice(object):
     @property
     def lastUpdated(self):
         return self._lastUpdated
+    @property
+    def isLost(self):
+        if self._mode == PET_MODE_LOST:
+            return True
+        else:
+            return False
