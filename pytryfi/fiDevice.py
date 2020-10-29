@@ -26,7 +26,7 @@ class FiDevice(object):
             self._availableLedColors.append(c)
 
     def __str__(self):
-        return f"Last Updated - {self.lastUpdated} - Device ID: {self.deviceId} Battery Left: {self.batteryPercent}% LED State: {self.ledOn} Last Connected: {self.connectionStateDate} by: {self.connectionStateType}"
+        return f"Last Updated - {self.lastUpdated} - Device ID: {self.deviceId} Device Mode: {self.mode} Battery Left: {self.batteryPercent}% LED State: {self.ledOn} Last Connected: {self.connectionStateDate} by: {self.connectionStateType}"
 
     @property
     def deviceId(self):
@@ -34,6 +34,9 @@ class FiDevice(object):
     @property
     def moduleId(self):
         return self._moduleId
+    @property
+    def mode(self):
+        return self._mode
     @property
     def buildId(self):
         return self._buildId
