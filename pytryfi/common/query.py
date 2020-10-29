@@ -53,6 +53,12 @@ def turnOnOffLed(sessionId, moduleId, ledEnabled):
     response = mutation(sessionId, qString, qVariables)
     return response['data']
 
+def setDogMode(sessionId, moduleId, mode):
+    qString = MUTATION_DEVICE_OPS + FRAGMENT_DEVICE_DETAILS + FRAGMENT_OPERATIONAL_DETAILS + FRAGMENT_CONNECTION_STATE_DETAILS + FRAGMENT_USER_DETAILS + FRAGMENT_LED_DETAILS
+    qVariables = '{"input": {"moduleId":"'+moduleId+'","mode":'+mode+'}}'
+    response = mutation(sessionId, qString, qVariables)
+    return response['data']
+
 def getGraphqlURL():
     return API_HOST_URL_BASE + API_GRAPHQL
 
