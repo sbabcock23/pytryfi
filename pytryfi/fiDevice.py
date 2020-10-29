@@ -1,5 +1,6 @@
 import datetime
 from pytryfi.ledColors import ledColors
+from pytryfi.const import PET_MODE_NORMAL, PET_MODE_LOST
 
 class FiDevice(object):
     def __init__(self, deviceId):
@@ -13,6 +14,7 @@ class FiDevice(object):
         self._batteryHealth = deviceJSON['info']['batteryHealth']
         self._ledOn = bool(deviceJSON['operationParams']['ledEnabled'])
         self._ledOffAt = deviceJSON['operationParams']['ledOffAt']
+        self._mode = deviceJSON['operationParams']['mode']
         self._ledColor = deviceJSON['ledColor']['name']
         self._ledColorHex = deviceJSON['ledColor']['hexCode']
         self._connectionStateDate = datetime.datetime.fromisoformat(str(deviceJSON['lastConnectionState']['date']).replace('Z', '+00:00'))
@@ -24,7 +26,7 @@ class FiDevice(object):
             self._availableLedColors.append(c)
 
     def __str__(self):
-        return f"Last Updated - {self.lastUpdated} - Device ID: {self.deviceId} Battery Left: {self.batteryPercent}% LED State: {self.ledOn} Last Connected: {self.connectionStateDate} by: {self.connectionStateType}"
+        return f"Last Updated - {self.lastUpdated} - Device ID: {self.deviceId} Device Mode: {self.mode} Battery Left: {self.batteryPercent}% LED State: {self.ledOn} Last Connected: {self.connectionStateDate} by: {self.connectionStateType}"
 
     @property
     def deviceId(self):
@@ -32,6 +34,9 @@ class FiDevice(object):
     @property
     def moduleId(self):
         return self._moduleId
+    @property
+    def mode(self):
+        return self._mode
     @property
     def buildId(self):
         return self._buildId
@@ -68,3 +73,9 @@ class FiDevice(object):
     @property
     def lastUpdated(self):
         return self._lastUpdated
+    @property
+    def isLost(self):
+        if self._mode == PET_MODE_LOST:
+            return True
+        else:
+            return False

@@ -48,9 +48,19 @@ def setLedColor(sessionId, deviceId, ledColorCode):
     response = mutation(sessionId, qString, qVariables)
     return response['data']
 
-def turnOnOffLed(sessionId, moduleId, mode, ledEnabled):
-    qString = MUTATION_ENABLE_LED + FRAGMENT_DEVICE_DETAILS + FRAGMENT_OPERATIONAL_DETAILS + FRAGMENT_CONNECTION_STATE_DETAILS + FRAGMENT_USER_DETAILS + FRAGMENT_LED_DETAILS
-    qVariables = '{"input": {"moduleId":"'+moduleId+'","mode":"'+mode+'","ledEnabled":'+str(ledEnabled).lower()+'}}'
+def turnOnOffLed(sessionId, moduleId, ledEnabled):
+    qString = MUTATION_DEVICE_OPS + FRAGMENT_DEVICE_DETAILS + FRAGMENT_OPERATIONAL_DETAILS + FRAGMENT_CONNECTION_STATE_DETAILS + FRAGMENT_USER_DETAILS + FRAGMENT_LED_DETAILS
+    qVariables = '{"input": {"moduleId":"'+moduleId+'","ledEnabled":'+str(ledEnabled).lower()+'}}'
+    response = mutation(sessionId, qString, qVariables)
+    return response['data']
+
+def setLostDogMode(sessionId, moduleId, action):
+    if action:
+        mode = PET_MODE_LOST
+    else:
+        mode = PET_MODE_NORMAL
+    qString = MUTATION_DEVICE_OPS + FRAGMENT_DEVICE_DETAILS + FRAGMENT_OPERATIONAL_DETAILS + FRAGMENT_CONNECTION_STATE_DETAILS + FRAGMENT_USER_DETAILS + FRAGMENT_LED_DETAILS
+    qVariables = '{"input": {"moduleId":"'+moduleId+'","mode":"'+mode+'"}}'
     response = mutation(sessionId, qString, qVariables)
     return response['data']
 

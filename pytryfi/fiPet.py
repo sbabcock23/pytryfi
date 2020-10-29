@@ -36,7 +36,7 @@ class FiPet(object):
         self._device.setDeviceDetailsJSON(petJSON['device'])
 
     def __str__(self):
-        return f"Last Updated - {self.lastUpdated} - Pet ID: {self.petId} Name: {self.name} From: {self.homeCityState} Located: {self.currLatitude},{self.currLongitude} Last Updated: {self.currStartTime}\n \
+        return f"Last Updated - {self.lastUpdated} - Pet ID: {self.petId} Name: {self.name} Is Lost: {self.isLost} From: {self.homeCityState} Located: {self.currLatitude},{self.currLongitude} Last Updated: {self.currStartTime}\n \
             using Device/Collar: {self._device}"
     
     # set the Pet's current location details
@@ -134,18 +134,28 @@ class FiPet(object):
     def turnOnOffLed(self, sessionId, action):
         try:
             moduleId = self.device.moduleId
-            mode = "NORMAL"
-            if action:
-                ledEnabled = True
-            else:
-                ledEnabled = False
-            onOffResponse = query.turnOnOffLed(sessionId, moduleId, mode, ledEnabled)
+            onOffResponse = query.turnOnOffLed(sessionId, moduleId, action)
             try:
                 self.device.setDeviceDetailsJSON(onOffResponse['updateDeviceOperationParams'])
             except Exception as e:
                 LOGGER.warning(f"Action: {action} was successful however unable to get current status for Pet: {self.name}")
             return True
         except Exception as e:
+            LOGGER.error(f"Could not complete LED request:\n{e}")
+            return False
+
+    # set the lost dog mode to Normal or Lost Dog. Action is true for lost dog and false for normal (not lost)
+    def setLostDogMode(self, sessionId, action):
+        try:
+            moduleId = self.device.moduleId
+            petModeResponse = query.setLostDogMode(sessionId, moduleId, action)
+            try:
+                self.device.setDeviceDetailsJSON(petModeResponse['updateDeviceOperationParams'])
+            except Exception as e:
+                LOGGER.warning(f"Action: {action} was successful however unable to get current status for Pet: {self.name}")
+            return True
+        except Exception as e:
+            LOGGER.error(f"Could not complete Lost Dog Mode request:\n{e}")
             LOGGER.error(f"Could not complete turn on/off light where ledEnable is {action}.\nException: {e}")
             return False
 
@@ -230,6 +240,10 @@ class FiPet(object):
     @property
     def lastUpdated(self):
         return self._lastUpdated
+    @property
+    def isLost(self):
+        return self.device.isLost
+    
     def getBirthDate(self):
         return datetime.datetime(self.yearOfBirth, self.monthOfBirth, self.dayOfBirth)
     
