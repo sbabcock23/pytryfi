@@ -2,6 +2,9 @@ API_HOST_URL_BASE   = "https://api.tryfi.com"
 API_GRAPHQL         = "/graphql"
 API_LOGIN           = "/auth/login"
 
+PET_MODE_NORMAL = "NORMAL"
+PET_MODE_LOST = "LOST_DOG"
+
 VAR_PET_ID = "__PET_ID__"
 
 QUERY_CURRENT_USER  = "query {\n  currentUser {\n    ...UserDetails\n  }\n}\n"

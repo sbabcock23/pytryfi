@@ -115,12 +115,12 @@ class FiPet(object):
     def turnOnOffLed(self, sessionId, action):
         try:
             moduleId = self.device.moduleId
-            mode = "NORMAL"
+            #mode = "NORMAL"
             if action:
                 ledEnabled = True
             else:
                 ledEnabled = False
-            onOffResponse = query.turnOnOffLed(sessionId, moduleId, mode, ledEnabled)
+            onOffResponse = query.turnOnOffLed(sessionId, moduleId, ledEnabled)
             try:
                 self.device.setDeviceDetailsJSON(onOffResponse['updateDeviceOperationParams'])
             except Exception as e:
