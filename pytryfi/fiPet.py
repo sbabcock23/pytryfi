@@ -115,19 +115,28 @@ class FiPet(object):
     def turnOnOffLed(self, sessionId, action):
         try:
             moduleId = self.device.moduleId
-            #mode = "NORMAL"
-            if action:
-                ledEnabled = True
-            else:
-                ledEnabled = False
-            onOffResponse = query.turnOnOffLed(sessionId, moduleId, ledEnabled)
+            onOffResponse = query.turnOnOffLed(sessionId, moduleId, action)
             try:
                 self.device.setDeviceDetailsJSON(onOffResponse['updateDeviceOperationParams'])
             except Exception as e:
                 LOGGER.warning(f"Action: {action} was successful however unable to get current status for Pet: {self.name}")
             return True
         except Exception as e:
-            LOGGER.error(f"Could not complete request:\n{e}")
+            LOGGER.error(f"Could not complete LED request:\n{e}")
+            return False
+
+    # set the lost dog mode to Normal or Lost Dog. Action is true for lost dog and false for normal (not lost)
+    def setLostDogMode(self, sessionId, action):
+        try:
+            moduleId = self.device.moduleId
+            petModeResponse = query.setLostDogMode(sessionId, moduleId, action)
+            try:
+                self.device.setDeviceDetailsJSON(petModeResponse['updateDeviceOperationParams'])
+            except Exception as e:
+                LOGGER.warning(f"Action: {action} was successful however unable to get current status for Pet: {self.name}")
+            return True
+        except Exception as e:
+            LOGGER.error(f"Could not complete Lost Dog Mode request:\n{e}")
             return False
 
     @property

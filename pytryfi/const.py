@@ -32,5 +32,5 @@ FRAGMENT_LOCATION_POINT = "fragment LocationPoint on Location {\n  __typename\n 
 FRAGMENT_PLACE_DETAILS = "fragment PlaceDetails on Place {\n  __typename\n  id\n  name\n  address\n  position {\n    __typename\n    ...PositionCoordinates\n  }\n  radius\n}\n"
 FRAGMENT_ACTIVITY_SUMMARY_DETAILS = "fragment ActivitySummaryDetails on ActivitySummary {\n  __typename\n  start\n  end\n  totalSteps\n  stepGoal\n  dailySteps {\n    __typename\n    date\n    totalSteps\n    stepGoal\n  }\n  totalDistance\n}\n"
 
-MUTATION_ENABLE_LED = "mutation UpdateDeviceOperationParams($input: UpdateDeviceOperationParamsInput!) {\n  updateDeviceOperationParams(input: $input) {\n    __typename\n    ...DeviceDetails\n  }\n}\n"
+MUTATION_DEVICE_OPS = "mutation UpdateDeviceOperationParams($input: UpdateDeviceOperationParamsInput!) {\n  updateDeviceOperationParams(input: $input) {\n    __typename\n    ...DeviceDetails\n  }\n}\n"
 MUTATION_SET_LED_COLOR = "mutation SetDeviceLed($moduleId: String!, $ledColorCode: Int!) {\n  setDeviceLed(moduleId: $moduleId, ledColorCode: $ledColorCode) {\n    __typename\n    ...DeviceDetails\n  }\n}\n"
