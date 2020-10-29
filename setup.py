@@ -19,7 +19,7 @@ print(pkg)
 
 setup(
     name="pytryfi", # Replace with your own username
-    version="0.0.6",
+    version="0.0.7",
     author="Steve Babcock",
     author_email="steve.w.babcock@gmail.com",
     description="Python Interface for TryFi Dog Collars",
