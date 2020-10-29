@@ -40,19 +40,31 @@ tryfi.pets[0].updateAllDetails(tryfi.session)
 tryfi.pets[0].setLedColorCode(tryfi.session, 2)
 
 #this will turn on the LED light on the color
-tryfi.pets[0].turnOnOffLed(tryfi.session,"ON")
+tryfi.pets[0].turnOnOffLed(tryfi.session,True)
 #or turn it off
-tryfi.pets[0].turnOnOffLed(tryfi.session,"OFF")
+tryfi.pets[0].turnOnOffLed(tryfi.session,False)
+
+#this will turn on the lost dog mode
+tryfi.pets[0].setLostDogMode(tryfi.session,True)
+#or turn it off
+tryfi.pets[0].setLostDogMode(tryfi.session,False)
+
+#this will get the lost dog mode status/state currently in the object
+tryfi.pets[0].isLost
 ```
 
 ## To Do
 * Provide Activity Data History
-* Submit Dog Lost Action
 
 ## Links:
 * [TryFi](https://tryfi.com/)
 
 # Version History
+## 0.0.6
+* Added function to submit Lost Dog Action
+* Added isLost property to Pet
+* Code cleanup
+
 ## 0.0.5
 * Added global update function that updates both pets and bases (pytryfi.update())
 * Added better error handling
