@@ -153,7 +153,7 @@ class PyTryFi(object):
             response = self._session.post(url, data=params)
             response.raise_for_status()
         except requests.RequestException as e:
-            LOGGER.error(f"Cannot login, response: ({response.status_code})")
+            LOGGER.error(f"Cannot login, error: ({e})")
             raise requests.RequestException(e)
         error = None
         try:
