@@ -60,6 +60,9 @@ tryfi.pets[0].isLost
 * [TryFi](https://tryfi.com/)
 
 # Version History
+## 0.0.7
+* Bug fixes when updating objects
+
 ## 0.0.6
 * Added function to submit Lost Dog Action
 * Added isLost property to Pet

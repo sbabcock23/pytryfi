@@ -45,8 +45,13 @@ class FiPet(object):
             self._currLongitude = float(activityJSON['position']['longitude'])
             self._currLatitude = float(activityJSON['position']['latitude'])
             self._currStartTime = datetime.datetime.fromisoformat(activityJSON['start'].replace('Z', '+00:00'))
-            self._currPlaceName = activityJSON['place']['name']
-            self._currPlaceAddress = activityJSON['place']['address']
+            try:
+                self._currPlaceName = activityJSON['place']['name']
+                self._currPlaceAddress = activityJSON['place']['address']
+            except:
+                LOGGER.warning("Could not set place, defaulting to Unknown")
+                self._currPlaceName = "UNKNOWN"
+                self._currPlaceAddress = "UNKNOWN"
             self._lastUpdated = datetime.datetime.now()
         except TryFiError as e:
             LOGGER.error(f"Unable to set values Current Location for Pet {self.name}.\nException: {e}\nwhile parsing {activityJSON}")
