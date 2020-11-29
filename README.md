@@ -60,6 +60,9 @@ tryfi.pets[0].isLost
 * [TryFi](https://tryfi.com/)
 
 # Version History
+## 0.0.8
+* Bugfix - handle unknown location
+
 ## 0.0.7
 * Bug fixes when updating objects
 
