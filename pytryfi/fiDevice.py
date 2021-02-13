@@ -15,10 +15,7 @@ class FiDevice(object):
         self._batteryPercent = int(deviceJSON['info']['batteryPercent'])
         self._isCharging = bool(deviceJSON['info']['isCharging'])
         self._batteryHealth = deviceJSON['info']['batteryHealth']
-        #self._ledOffAt = deviceJSON['operationParams']['ledOffAt']
-        #self._ledOffAt = datetime.datetime.fromisoformat(str(deviceJSON['operationParams']['ledOffAt']).replace('Z', '+00:00'))
         self._ledOffAt = self.setLedOffAtDate(deviceJSON['operationParams']['ledOffAt'])
-        #self._ledOn = bool(deviceJSON['operationParams']['ledEnabled'])
         self._ledOn = self.getAccurateLEDStatus( bool(deviceJSON['operationParams']['ledEnabled']))
         self._mode = deviceJSON['operationParams']['mode']
         self._ledColor = deviceJSON['ledColor']['name']
