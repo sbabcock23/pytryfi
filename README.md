@@ -60,6 +60,9 @@ tryfi.pets[0].isLost
 * [TryFi](https://tryfi.com/)
 
 # Version History
+## 0.0.9
+* Bugfix - get LED status based on additional logic that compares the ledOffAt date with the current date/time. Update the boolean to True or False base on the additional date comparison.
+
 ## 0.0.8
 * Bugfix - handle unknown location
 

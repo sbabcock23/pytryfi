@@ -1,6 +1,9 @@
+import logging
 import datetime
 from pytryfi.ledColors import ledColors
 from pytryfi.const import PET_MODE_NORMAL, PET_MODE_LOST
+
+LOGGER = logging.getLogger(__name__)
 
 class FiDevice(object):
     def __init__(self, deviceId):
@@ -12,8 +15,11 @@ class FiDevice(object):
         self._batteryPercent = int(deviceJSON['info']['batteryPercent'])
         self._isCharging = bool(deviceJSON['info']['isCharging'])
         self._batteryHealth = deviceJSON['info']['batteryHealth']
-        self._ledOn = bool(deviceJSON['operationParams']['ledEnabled'])
-        self._ledOffAt = deviceJSON['operationParams']['ledOffAt']
+        #self._ledOffAt = deviceJSON['operationParams']['ledOffAt']
+        #self._ledOffAt = datetime.datetime.fromisoformat(str(deviceJSON['operationParams']['ledOffAt']).replace('Z', '+00:00'))
+        self._ledOffAt = self.setLedOffAtDate(deviceJSON['operationParams']['ledOffAt'])
+        #self._ledOn = bool(deviceJSON['operationParams']['ledEnabled'])
+        self._ledOn = self.getAccurateLEDStatus( bool(deviceJSON['operationParams']['ledEnabled']))
         self._mode = deviceJSON['operationParams']['mode']
         self._ledColor = deviceJSON['ledColor']['name']
         self._ledColorHex = deviceJSON['ledColor']['hexCode']
@@ -79,3 +85,28 @@ class FiDevice(object):
             return True
         else:
             return False
+
+#This is created because if TryFi automatically turns off the LED, the status is still set to true in the api.
+#This will compare the dates to see if the current date/time is greater than the turnoffat time in the api.
+    def getAccurateLEDStatus(self, ledStatus):
+        if ledStatus is False:
+            LOGGER.debug("getAccurateLedStatus: LED Status is False")
+            return False
+        else:
+            LOGGER.debug("getAccurateLedStatus: LED Status is True... comparing date/times")
+            currentDateTime = datetime.datetime.now(datetime.timezone.utc)
+            if currentDateTime > self.ledOffAt:
+                LOGGER.debug(f"Current datetime: {currentDateTime} is greater than ledOffAt: {self.ledOffAt}, Returning False")
+                return False
+            else:
+                LOGGER.debug(f"Current datetime: {currentDateTime} is less than ledOffAt: {self.ledOffAt}, Returning False")
+                return True
+#Created function to return a date/time regardless.
+    def setLedOffAtDate(self, ledOffAt):
+        if ledOffAt == None:
+            ## if object is null, return current date/time in UTC
+            LOGGER.debug("LedOffAt is None, returning current datetime in UTC")
+            return datetime.datetime.now(datetime.timezone.utc)
+        else:
+            LOGGER.debug(f"LedOffAt has date/time of {ledOffAt}. Returning this in ISO Format.")
+            return datetime.datetime.fromisoformat(str(ledOffAt).replace('Z', '+00:00'))
