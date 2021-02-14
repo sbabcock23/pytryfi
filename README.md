@@ -4,7 +4,10 @@ This python interface enables you to gather information about your dogs whereabo
 NOTE: Since this interacts with undocumented APIs, this may change without notice.
 
 ## Installation
-TBD
+To install this package, use pip
+```python
+python -m pip install "pytryfi"
+```
 
 ## Usage
 TryFi uses Graphql for its APIs. Essentially, you will use your username (email address) and password to retrieve a unique username specific for API calls which in turn will be used for the duration to retrieve data.
@@ -60,6 +63,10 @@ tryfi.pets[0].isLost
 * [TryFi](https://tryfi.com/)
 
 # Version History
+## 0.0.10
+* Enhancement - added areaName property that could be used to idenitfy a location (tryfi.pets[0].areaName)
+* Bugfix - fixed longitude and latitude while Pet is on a walk
+
 ## 0.0.9
 * Bugfix - get LED status based on additional logic that compares the ledOffAt date with the current date/time. Update the boolean to True or False base on the additional date comparison.
 
