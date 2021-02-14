@@ -2,6 +2,7 @@ import logging
 from pytryfi.fiDevice import FiDevice
 from pytryfi.common import query
 from pytryfi.exceptions import *
+from pytryfi.const import PET_ACTIVITY_ONGOINGWALK
 import datetime
 
 LOGGER = logging.getLogger(__name__)
@@ -36,15 +37,24 @@ class FiPet(object):
         self._device.setDeviceDetailsJSON(petJSON['device'])
 
     def __str__(self):
-        return f"Last Updated - {self.lastUpdated} - Pet ID: {self.petId} Name: {self.name} Is Lost: {self.isLost} From: {self.homeCityState} Located: {self.currLatitude},{self.currLongitude} Last Updated: {self.currStartTime}\n \
+        return f"Last Updated - {self.lastUpdated} - Pet ID: {self.petId} Name: {self.name} Is Lost: {self.isLost} From: {self.homeCityState} ActivityType: {self.activityType} Located: {self.currLatitude},{self.currLongitude} Last Updated: {self.currStartTime}\n \
             using Device/Collar: {self._device}"
     
     # set the Pet's current location details
     def setCurrentLocation(self, activityJSON):
+        activityType = activityJSON['__typename']
+        self._activityType = activityType
+        self._areaName = activityJSON['areaName']
         try:
-            self._currLongitude = float(activityJSON['position']['longitude'])
-            self._currLatitude = float(activityJSON['position']['latitude'])
-            self._currStartTime = datetime.datetime.fromisoformat(activityJSON['start'].replace('Z', '+00:00'))
+            if activityType == PET_ACTIVITY_ONGOINGWALK:
+                positionSize = len(activityJSON['positions'])
+                self._currLongitude = float(activityJSON['positions'][positionSize-1]['position']['longitude'])
+                self._currLatitude = float(activityJSON['positions'][positionSize-1]['position']['latitude'])
+                self._currStartTime = datetime.datetime.fromisoformat(activityJSON['start'].replace('Z', '+00:00'))            
+            else:          
+                self._currLongitude = float(activityJSON['position']['longitude'])
+                self._currLatitude = float(activityJSON['position']['latitude'])
+                self._currStartTime = datetime.datetime.fromisoformat(activityJSON['start'].replace('Z', '+00:00'))
             try:
                 self._currPlaceName = activityJSON['place']['name']
                 self._currPlaceAddress = activityJSON['place']['address']
@@ -248,6 +258,12 @@ class FiPet(object):
     @property
     def isLost(self):
         return self.device.isLost
+    @property
+    def activityType(self):
+        return self._activityType
+    @property
+    def areaName(self):
+        return self._areaName
     
     def getBirthDate(self):
         return datetime.datetime(self.yearOfBirth, self.monthOfBirth, self.dayOfBirth)

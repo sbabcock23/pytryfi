@@ -1,10 +1,14 @@
 from pytryfi.const import *
 from pytryfi.exceptions import *
 import requests
+import logging
+
+LOGGER = logging.getLogger(__name__)
 
 def getUserDetail(sessionId):
     qString = QUERY_CURRENT_USER + FRAGMENT_USER_DETAILS
     response = query(sessionId, qString)
+    LOGGER.debug(f"getUserDetails: {response}")
     return response['data']['currentUser']
 
 def getPetList(sessionId):
@@ -14,6 +18,7 @@ def getPetList(sessionId):
         + FRAGMENT_PHOTO_DETAILS + FRAGMENT_DEVICE_DETAILS + FRAGMENT_LED_DETAILS + FRAGMENT_OPERATIONAL_DETAILS \
         + FRAGMENT_CONNECTION_STATE_DETAILS
     response = query(sessionId, qString)
+    LOGGER.debug(f"getPetList: {response}")
     return response['data']['currentUser']['userHouseholds'][0]['household']['pets']
 
 def getBaseList(sessionId):
@@ -23,6 +28,7 @@ def getBaseList(sessionId):
         + FRAGMENT_PHOTO_DETAILS + FRAGMENT_DEVICE_DETAILS + FRAGMENT_LED_DETAILS + FRAGMENT_OPERATIONAL_DETAILS \
         + FRAGMENT_CONNECTION_STATE_DETAILS
     response = query(sessionId, qString)
+    LOGGER.debug(f"getBaseList: {response}")
     return response['data']['currentUser']['userHouseholds'][0]['household']['bases']
 
 def getCurrentPetLocation(sessionId, petId):
@@ -30,16 +36,19 @@ def getCurrentPetLocation(sessionId, petId):
         + FRAGMENT_UNCERTAINTY_DETAILS + FRAGMENT_CIRCLE_DETAILS + FRAGMENT_LOCATION_POINT \
         + FRAGMENT_PLACE_DETAILS + FRAGMENT_USER_DETAILS + FRAGMENT_POSITION_COORDINATES
     response = query(sessionId, qString)
+    LOGGER.debug(f"getCurrentPetLocation: {response}")
     return response['data']['pet']['ongoingActivity']
 
 def getCurrentPetStats(sessionId, petId):
     qString = QUERY_PET_ACTIVITY.replace(VAR_PET_ID, petId) + FRAGMENT_ACTIVITY_SUMMARY_DETAILS
     response = query(sessionId, qString)
+    LOGGER.debug(f"getCurrentPetStats: {response}")
     return response['data']['pet']
 
 def getDevicedetails(sessionId, petId):
     qString = QUERY_PET_DEVICE_DETAILS.replace(VAR_PET_ID, petId) + FRAGMENT_PET_PROFILE + FRAGEMENT_BASE_PET_PROFILE + FRAGMENT_DEVICE_DETAILS + FRAGMENT_LED_DETAILS + FRAGMENT_OPERATIONAL_DETAILS + FRAGMENT_CONNECTION_STATE_DETAILS + FRAGMENT_USER_DETAILS + FRAGMENT_BREED_DETAILS + FRAGMENT_PHOTO_DETAILS
     response = query(sessionId, qString)
+    LOGGER.debug(f"getDevicedetails: {response}")
     return response['data']['pet']
 
 def setLedColor(sessionId, deviceId, ledColorCode):
