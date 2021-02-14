@@ -4,6 +4,8 @@ API_LOGIN           = "/auth/login"
 
 PET_MODE_NORMAL = "NORMAL"
 PET_MODE_LOST = "LOST_DOG"
+PET_ACTIVITY_WALK = "OngoingWalk"
+PET_ACTIVITY = "OngoingRest"
 
 VAR_PET_ID = "__PET_ID__"
 
