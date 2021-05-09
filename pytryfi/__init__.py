@@ -1,11 +1,14 @@
 import logging
 import requests
 
-from pytryfi.const import (API_HOST_URL_BASE, API_LOGIN, API_GRAPHQL)
+from pytryfi.const import (API_HOST_URL_BASE, API_LOGIN, API_GRAPHQL, PYTRYFI_VERSION)
 from pytryfi.fiUser import FiUser
 from pytryfi.fiPet import FiPet
 from pytryfi.fiBase import FiBase
 from pytryfi.common import query
+from pytryfi.const import SENTRY_URL
+import sentry_sdk
+
 
 
 LOGGER = logging.getLogger(__name__)
@@ -14,7 +17,11 @@ class PyTryFi(object):
     """base object for TryFi"""
 
     def __init__(self, username=None, password=None):
-
+        sentry = sentry_sdk.init(
+                SENTRY_URL,
+                release=PYTRYFI_VERSION,
+                traces_sample_rate=1.0,
+            )
         self._api_host = API_HOST_URL_BASE
         self._session = requests.Session()
         self._user_agent = "pyTryFi"
