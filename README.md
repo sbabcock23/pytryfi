@@ -63,6 +63,9 @@ tryfi.pets[0].isLost
 * [TryFi](https://tryfi.com/)
 
 # Version History
+## 0.0.11
+* Enhancement - added Sentry for capturing errors
+
 ## 0.0.10
 * Enhancement - added areaName property that could be used to idenitfy a location (tryfi.pets[0].areaName)
 * Bugfix - fixed longitude and latitude while Pet is on a walk
