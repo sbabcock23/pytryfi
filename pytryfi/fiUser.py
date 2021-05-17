@@ -1,17 +1,21 @@
 from pytryfi.common import query
 import datetime
+from sentry_sdk import capture_exception
 
 class FiUser(object):
     def __init__(self, userId):
         self._userId = userId
         
     def setUserDetails(self, sessionId):
-        response = query.getUserDetail(sessionId)
-        self._email = response['email']
-        self._firstName = response['firstName']
-        self._lastName = response['lastName']
-        self._phoneNumber = response['phoneNumber']
-        self._lastUpdated = datetime.datetime.now()
+        try:
+            response = query.getUserDetail(sessionId)
+            self._email = response['email']
+            self._firstName = response['firstName']
+            self._lastName = response['lastName']
+            self._phoneNumber = response['phoneNumber']
+            self._lastUpdated = datetime.datetime.now()
+        except Exception as e:
+            capture_exception(e)
 
     def __str__(self):
         return f"User ID: {self.userId} Name: {self.fullName} Email: {self.email}"

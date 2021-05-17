@@ -2,6 +2,7 @@ from pytryfi.const import *
 from pytryfi.exceptions import *
 import requests
 import logging
+from sentry_sdk import capture_exception
 
 LOGGER = logging.getLogger(__name__)
 
@@ -103,6 +104,9 @@ def execute(url, sessionId, method='GET', params=None, cookies=None):
         else:
             raise TryFiError(f"Method Passed was invalid: {method}")
     except requests.RequestException as e:
+        capture_exception(e)
         raise requests.RequestException(e)
+    except Exception as e:
+            capture_exception(e)
     return response
     
