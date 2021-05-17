@@ -63,6 +63,9 @@ tryfi.pets[0].isLost
 * [TryFi](https://tryfi.com/)
 
 # Version History
+## 0.0.12
+* Enhancement - added Sentry for capturing errors by further only capturing exceptions
+
 ## 0.0.11
 * Enhancement - added Sentry for capturing errors
 
