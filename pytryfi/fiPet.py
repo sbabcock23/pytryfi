@@ -34,7 +34,7 @@ class FiPet(object):
         try:
             self._photoLink = petJSON['photos']['first']['image']['fullSize']
         except Exception as e:
-            capture_exception(e)
+            #capture_exception(e)
             LOGGER.warning(f"Cannot find photo of your pet. Defaulting to empty string.")
             self._photoLink = ""
         try:
