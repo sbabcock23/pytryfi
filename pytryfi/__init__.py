@@ -188,7 +188,7 @@ class PyTryFi(object):
         try:
             error = response.json()['error']
         except Exception as e:
-            capture_exception(e)
+            #capture_exception(e)
             error = None
         if error or not response.ok:
             errorMsg = error['message']
