@@ -66,7 +66,7 @@ class FiPet(object):
                 self._currPlaceName = activityJSON['place']['name']
                 self._currPlaceAddress = activityJSON['place']['address']
             except Exception as e:
-                capture_exception(e)
+                #capture_exception(e)
                 LOGGER.warning("Could not set place, defaulting to Unknown")
                 self._currPlaceName = "UNKNOWN"
                 self._currPlaceAddress = "UNKNOWN"
