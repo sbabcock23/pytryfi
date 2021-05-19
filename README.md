@@ -63,6 +63,10 @@ tryfi.pets[0].isLost
 * [TryFi](https://tryfi.com/)
 
 # Version History
+# 0.0.13
+* Enhancement - removed error logging where not required
+* Fix - resolved issue where the variables are unbound in the login function
+
 ## 0.0.12
 * Enhancement - added Sentry for capturing errors by further only capturing exceptions
 
