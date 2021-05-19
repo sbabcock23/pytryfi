@@ -22,7 +22,6 @@ class PyTryFi(object):
             sentry = sentry_sdk.init(
                     SENTRY_URL,
                     release=PYTRYFI_VERSION,
-                    traces_sample_rate=0,
                 )
             self._api_host = API_HOST_URL_BASE
             self._session = requests.Session()
@@ -168,6 +167,7 @@ class PyTryFi(object):
 
     # login to the api and get a session
     def login(self):
+        error = None
         url = API_HOST_URL_BASE + API_LOGIN
         params={
                 'email' : self._username,
@@ -178,26 +178,28 @@ class PyTryFi(object):
         try:
             response = self._session.post(url, data=params)
             response.raise_for_status()
+            #validate if the response contains error or not
+            try:
+                error = response.json()['error']
+            except Exception as e:
+                #capture_exception(e)
+                error = None
+            #if error set or response is non-200
+            if error or not response.ok:
+                errorMsg = error['message']
+                LOGGER.error(f"Cannot login, response: ({response.status_code}): {errorMsg} ")
+                capture_exception(errorMsg)
+                raise Exception("TryFiLoginError")
+            
+            #storing cookies but don't need them. Handled by session mgmt
+            self._cookies = response.cookies
+            #store unique userId from login for future use
+            self._userId = response.json()['userId']
+            self._sessionId = response.json()['sessionId']
+            LOGGER.debug(f"Successfully logged in. UserId: {self._userId}")
         except requests.RequestException as e:
             LOGGER.error(f"Cannot login, error: ({e})")
             capture_exception(e)
             raise requests.RequestException(e)
         except Exception as e:
             capture_exception(e)
-        error = None
-        try:
-            error = response.json()['error']
-        except Exception as e:
-            capture_exception(e)
-            error = None
-        if error or not response.ok:
-            errorMsg = error['message']
-            LOGGER.error(f"Cannot login, response: ({response.status_code}): {errorMsg} ")
-            capture_exception(errorMsg)
-            raise Exception("TryFiLoginError")
-        #storing cookies but don't need them. Handled by session mgmt
-        self._cookies = response.cookies
-        #store unique userId from login for future use
-        self._userId = response.json()['userId']
-        self._sessionId = response.json()['sessionId']
-        LOGGER.debug(f"Successfully logged in. UserId: {self._userId}")
