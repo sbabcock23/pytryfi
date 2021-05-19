@@ -22,7 +22,6 @@ class PyTryFi(object):
             sentry = sentry_sdk.init(
                     SENTRY_URL,
                     release=PYTRYFI_VERSION,
-                    traces_sample_rate=0,
                 )
             self._api_host = API_HOST_URL_BASE
             self._session = requests.Session()
