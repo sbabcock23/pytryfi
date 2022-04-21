@@ -8,16 +8,15 @@ LOGGER = logging.getLogger(__name__)
 class FiDevice(object):
     def __init__(self, deviceId):
         self._deviceId = deviceId
-    
+
     def setDeviceDetailsJSON(self, deviceJSON):
         try:
             self._moduleId = deviceJSON['moduleId']
             self._buildId = deviceJSON['info']['buildId']
             self._batteryPercent = int(deviceJSON['info']['batteryPercent'])
-            self._isCharging = bool(deviceJSON['info']['isCharging'])
             self._batteryHealth = deviceJSON['info']['batteryHealth']
             self._ledOffAt = self.setLedOffAtDate(deviceJSON['operationParams']['ledOffAt'])
-            self._ledOn = self.getAccurateLEDStatus( bool(deviceJSON['operationParams']['ledEnabled']))
+            self._ledOn = self.getAccurateLEDStatus(bool(deviceJSON['operationParams']['ledEnabled']))
             self._mode = deviceJSON['operationParams']['mode']
             self._ledColor = deviceJSON['ledColor']['name']
             self._ledColorHex = deviceJSON['ledColor']['hexCode']

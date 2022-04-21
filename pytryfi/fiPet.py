@@ -46,7 +46,7 @@ class FiPet(object):
     def __str__(self):
         return f"Last Updated - {self.lastUpdated} - Pet ID: {self.petId} Name: {self.name} Is Lost: {self.isLost} From: {self.homeCityState} ActivityType: {self.activityType} Located: {self.currLatitude},{self.currLongitude} Last Updated: {self.currStartTime}\n \
             using Device/Collar: {self._device}"
-    
+
     # set the Pet's current location details
     def setCurrentLocation(self, activityJSON):
         activityType = activityJSON['__typename']
@@ -57,8 +57,8 @@ class FiPet(object):
                 positionSize = len(activityJSON['positions'])
                 self._currLongitude = float(activityJSON['positions'][positionSize-1]['position']['longitude'])
                 self._currLatitude = float(activityJSON['positions'][positionSize-1]['position']['latitude'])
-                self._currStartTime = datetime.datetime.fromisoformat(activityJSON['start'].replace('Z', '+00:00'))            
-            else:          
+                self._currStartTime = datetime.datetime.fromisoformat(activityJSON['start'].replace('Z', '+00:00'))
+            else:
                 self._currLongitude = float(activityJSON['position']['longitude'])
                 self._currLatitude = float(activityJSON['position']['latitude'])
                 self._currStartTime = datetime.datetime.fromisoformat(activityJSON['start'].replace('Z', '+00:00'))
@@ -135,7 +135,7 @@ class FiPet(object):
             LOGGER.error(f"Could not update Pet: {self.name}'s location.\n{e}")
             capture_exception(e)
             return False
-    
+
     # Update the device/collar details for this pet
     def updateDeviceDetails(self, sessionId):
         try:
@@ -169,7 +169,7 @@ class FiPet(object):
             LOGGER.error(f"Could not complete Led Color request:\n{e}")
             capture_exception(e)
             return False
-    
+
     # turn on or off the led light. action = True will enable the light, false turns off the light
     def turnOnOffLed(self, sessionId, action):
         try:
@@ -293,13 +293,13 @@ class FiPet(object):
     @property
     def areaName(self):
         return self._areaName
-    
+
     def getBirthDate(self):
         return datetime.datetime(self.yearOfBirth, self.monthOfBirth, self.dayOfBirth)
-    
+
     def getDailySteps(self):
         return self.dailySteps
-    
+
     def getDailyGoal(self):
         return self.dailyGoal
 
@@ -308,7 +308,7 @@ class FiPet(object):
 
     def getWeeklySteps(self):
         return self.weeklySteps
-    
+
     def getWeeklyGoal(self):
         return self.weeklyGoal
 
@@ -317,10 +317,9 @@ class FiPet(object):
 
     def getMonthlySteps(self):
         return self.monthlySteps
-    
+
     def getMonthlyGoal(self):
         return self.monthlyGoal
 
     def getMonthlyDistance(self):
         return self.monthlyTotalDistance
-        

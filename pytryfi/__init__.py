@@ -45,7 +45,7 @@ class PyTryFi(object):
                 p.setStats(pStatsJSON['dailyStat'],pStatsJSON['weeklyStat'],pStatsJSON['monthlyStat'])
                 LOGGER.debug(f"Adding Pet: {p._name} with Device: {p._device._deviceId}")
                 self._pets.append(p)
-            
+
             self._bases = []
             baseListJSON = query.getBaseList(self._session)
             for base in baseListJSON:
@@ -66,7 +66,7 @@ class PyTryFi(object):
         for p in self.pets:
             petString = petString + f"{p}"
         return f"TryFi Instance - {instString}\n Pets in Home:\n {petString}\n Bases In Home:\n {baseString}"
-        
+
     #refresh pet details for all pets
     def updatePets(self):
         try:
@@ -173,7 +173,7 @@ class PyTryFi(object):
                 'email' : self._username,
                 'password' : self._password,
             }
-        
+
         LOGGER.debug(f"Logging into TryFi")
         try:
             response = self._session.post(url, data=params)
@@ -190,7 +190,7 @@ class PyTryFi(object):
                 LOGGER.error(f"Cannot login, response: ({response.status_code}): {errorMsg} ")
                 capture_exception(errorMsg)
                 raise Exception("TryFiLoginError")
-            
+
             #storing cookies but don't need them. Handled by session mgmt
             self._cookies = response.cookies
             #store unique userId from login for future use
