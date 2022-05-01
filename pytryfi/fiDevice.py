@@ -25,7 +25,6 @@ class FiDevice(object):
             self._ledOffAt = self.setLedOffAtDate(deviceJSON['operationParams']['ledOffAt'])
             self._ledOn = self.getAccurateLEDStatus( bool(deviceJSON['operationParams']['ledEnabled']))
             
-            print(deviceJSON['operationParams']['mode'])
             self._mode = deviceJSON['operationParams']['mode']
             self._ledColor = deviceJSON['ledColor']['name']
             self._ledColorHex = deviceJSON['ledColor']['hexCode']
