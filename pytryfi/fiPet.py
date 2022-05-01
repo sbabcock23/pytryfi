@@ -59,7 +59,7 @@ class FiPet(object):
         elif typename == 'ConnectedToBase':
             connectedToString = connectedToString + "Base ID - " + connectedToJSON['chargingBase']['id']
         else:
-            connectedToString = connectedToString + "Unkown!"
+            connectedToString = connectedToString + "Unknown!"
         return connectedToString
 
     # set the Pet's current location details
