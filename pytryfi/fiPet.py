@@ -42,11 +42,26 @@ class FiPet(object):
             self._device.setDeviceDetailsJSON(petJSON['device'])
         except Exception as e:
             capture_exception(e)
+        self._connectedTo = self.setConnectedTo(petJSON['device']['lastConnectionState'])
 
     def __str__(self):
-        return f"Last Updated - {self.lastUpdated} - Pet ID: {self.petId} Name: {self.name} Is Lost: {self.isLost} From: {self.homeCityState} ActivityType: {self.activityType} Located: {self.currLatitude},{self.currLongitude} Last Updated: {self.currStartTime}\n \
+        return f"Last Updated - {self.lastUpdated} - Pet ID: {self.petId} Name: {self.name} Connected To: {self.connectedTo} Is Lost: {self.isLost} From: {self.homeCityState} ActivityType: {self.activityType} Located: {self.currLatitude},{self.currLongitude} Last Updated: {self.currStartTime}\n \
             using Device/Collar: {self._device}"
     
+    # set the connected to friendly string
+    def setConnectedTo(self, connectedToJSON):
+        connectedToString = ""
+        typename = connectedToJSON['__typename']
+        if typename == 'ConnectedToUser':
+            connectedToString = connectedToString + connectedToJSON['user']['firstName'] + " " + connectedToJSON['user']['lastName']
+        elif typename == 'ConnectedToCellular':
+            connectedToString = connectedToString + "Cellular! Signal Strength - " + connectedToJSON['signalStrengthPercent']
+        elif typename == 'ConnectedToBase':
+            connectedToString = connectedToString + "Base ID - " + connectedToJSON['chargingBase']['id']
+        else:
+            connectedToString = connectedToString + "Unkown!"
+        return connectedToString
+
     # set the Pet's current location details
     def setCurrentLocation(self, activityJSON):
         activityType = activityJSON['__typename']
@@ -293,6 +308,10 @@ class FiPet(object):
     @property
     def areaName(self):
         return self._areaName
+    
+    @property
+    def connectedTo(self):
+        return self._connectedTo
     
     def getBirthDate(self):
         return datetime.datetime(self.yearOfBirth, self.monthOfBirth, self.dayOfBirth)
