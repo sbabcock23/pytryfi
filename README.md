@@ -63,6 +63,9 @@ tryfi.pets[0].isLost
 * [TryFi](https://tryfi.com/)
 
 # Version History
+# 0.0.14
+* Fix - resolved issue between V1 and V2 of the TryFi collars where the isCharging property doesn't exist in V2. This causes failed parsing errors and some users get a ledOn error as a symptom in hass-tryfi (Home Assistant - TryFi implementation)
+
 # 0.0.13
 * Enhancement - removed error logging where not required
 * Fix - resolved issue where the variables are unbound in the login function
