@@ -51,16 +51,21 @@ class FiPet(object):
     # set the connected to friendly string
     def setConnectedTo(self, connectedToJSON):
         connectedToString = ""
-        typename = connectedToJSON['__typename']
-        if typename == 'ConnectedToUser':
-            connectedToString = connectedToString + connectedToJSON['user']['firstName'] + " " + connectedToJSON['user']['lastName']
-        elif typename == 'ConnectedToCellular':
-            connectedToString = connectedToString + "Cellular! Signal Strength - " + connectedToJSON['signalStrengthPercent']
-        elif typename == 'ConnectedToBase':
-            connectedToString = connectedToString + "Base ID - " + connectedToJSON['chargingBase']['id']
-        else:
-            connectedToString = connectedToString + "Unknown!"
-        return connectedToString
+        try:
+            typename = connectedToJSON['__typename']
+            if typename == 'ConnectedToUser':
+                connectedToString = connectedToJSON['user']['firstName'] + " " + connectedToJSON['user']['lastName']
+            elif typename == 'ConnectedToCellular':
+                connectedToString = "Cellular! Signal Strength - " + str(connectedToJSON['signalStrengthPercent'])
+            elif typename == 'ConnectedToBase':
+                connectedToString = "Base ID - " + connectedToJSON['chargingBase']['id']
+            else:
+                connectedToString = "Unknown!"
+            return connectedToString
+        except Exception as e:
+            LOGGER.error(f"Exception setting ConnectTo {e}")
+            capture_exception(e)
+            return "Unknown!"
 
     # set the Pet's current location details
     def setCurrentLocation(self, activityJSON):
