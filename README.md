@@ -18,6 +18,12 @@ TryFi uses Graphql for its APIs. Essentially, you will use your username (email 
 tryfi = PyTryFi(username, password)
 print(tryfi)
 
+#this will query sleep stats for given pet
+tryfi.pets[0].dailySleep
+
+#this will query nap stats for given pet
+tryfi.pets[0].dailyNap
+
 #this will perform a complete refresh of all Pets and data points
 tryfi.updatePets()
 

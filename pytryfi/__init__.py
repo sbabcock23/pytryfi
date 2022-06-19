@@ -43,6 +43,9 @@ class PyTryFi(object):
                 #get the daily, weekly and monthly stats and set
                 pStatsJSON = query.getCurrentPetStats(self._session,p._petId)
                 p.setStats(pStatsJSON['dailyStat'],pStatsJSON['weeklyStat'],pStatsJSON['monthlyStat'])
+                #get the daily, weekly and monthly rest stats and set
+                pRestStatsJSON = query.getCurrentPetRestStats(self._session,p._petId)
+                p.setRestStats(pRestStatsJSON['dailyStat'],pRestStatsJSON['weeklyStat'],pRestStatsJSON['monthlyStat'])
                 LOGGER.debug(f"Adding Pet: {p._name} with Device: {p._device._deviceId}")
                 self._pets.append(p)
             
@@ -81,6 +84,9 @@ class PyTryFi(object):
                 #get the daily, weekly and monthly stats and set
                 pStatsJSON = query.getCurrentPetStats(self._session,p._petId)
                 p.setStats(pStatsJSON['dailyStat'],pStatsJSON['weeklyStat'],pStatsJSON['monthlyStat'])
+                #get the daily, weekly and monthly rest stats and set
+                pRestStatsJSON = query.getCurrentPetRestStats(self._session,p._petId)
+                p.setRestStats(pRestStatsJSON['dailyStat'],pRestStatsJSON['weeklyStat'],pRestStatsJSON['monthlyStat'])
                 LOGGER.debug(f"Adding Pet: {p._name} with Device: {p._device._deviceId}")
                 updatedPets.append(p)
             self._pets = updatedPets
