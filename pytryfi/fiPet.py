@@ -116,6 +116,13 @@ class FiPet(object):
 
     # set the Pet's current rest details for daily, weekly and monthly
     def setRestStats(self, restJSONDaily, restJSONWeekly, restJSONMonthly):
+        #setting default values to zero in case this feature is not supported by older collars
+        self._dailyNap = 0
+        self._dailySleep = 0
+        self._weeklyNap = 0
+        self._weeklySleep = 0
+        self._monthlyNap = 0
+        self._monthlySleep = 0
         try:
             for sleepAmount in restJSONDaily['restSummaries'][0]['data']['sleepAmounts']:
                 if sleepAmount['type'] == 'SLEEP':
