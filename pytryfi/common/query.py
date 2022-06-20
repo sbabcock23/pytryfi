@@ -66,6 +66,16 @@ def getCurrentPetStats(sessionId, petId):
         LOGGER.error("Error performing query: " + e)
         capture_exception(e)
 
+def getCurrentPetRestStats(sessionId, petId):
+    try:
+        qString = QUERY_PET_REST.replace(VAR_PET_ID, petId) + FRAGMENT_REST_SUMMARY_DETAILS
+        response = query(sessionId, qString)
+        LOGGER.debug(f"getCurrentPetStats: {response}")
+        return response['data']['pet']
+    except Exception as e:
+        LOGGER.error("Error performing query: " + e)
+        capture_exception(e)
+
 def getDevicedetails(sessionId, petId):
     try:
         qString = QUERY_PET_DEVICE_DETAILS.replace(VAR_PET_ID, petId) + FRAGMENT_PET_PROFILE + FRAGEMENT_BASE_PET_PROFILE + FRAGMENT_DEVICE_DETAILS + FRAGMENT_LED_DETAILS + FRAGMENT_OPERATIONAL_DETAILS + FRAGMENT_CONNECTION_STATE_DETAILS + FRAGMENT_USER_DETAILS + FRAGMENT_BREED_DETAILS + FRAGMENT_PHOTO_DETAILS

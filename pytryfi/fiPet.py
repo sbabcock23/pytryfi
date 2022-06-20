@@ -58,7 +58,7 @@ class FiPet(object):
                 self._currLongitude = float(activityJSON['positions'][positionSize-1]['position']['longitude'])
                 self._currLatitude = float(activityJSON['positions'][positionSize-1]['position']['latitude'])
                 self._currStartTime = datetime.datetime.fromisoformat(activityJSON['start'].replace('Z', '+00:00'))            
-            else:          
+            else:
                 self._currLongitude = float(activityJSON['position']['longitude'])
                 self._currLatitude = float(activityJSON['position']['latitude'])
                 self._currStartTime = datetime.datetime.fromisoformat(activityJSON['start'].replace('Z', '+00:00'))
@@ -114,6 +114,44 @@ class FiPet(object):
 
         self._lastUpdated = datetime.datetime.now()
 
+    # set the Pet's current rest details for daily, weekly and monthly
+    def setRestStats(self, restJSONDaily, restJSONWeekly, restJSONMonthly):
+        try:
+            for sleepAmount in restJSONDaily['restSummaries'][0]['data']['sleepAmounts']:
+                if sleepAmount['type'] == 'SLEEP':
+                    self._dailySleep = int(sleepAmount['duration'])
+                if sleepAmount['type'] == "NAP":
+                    self._dailyNap = int(sleepAmount['duration'])
+        except TryFiError as e:
+            LOGGER.error(f"Unable to set values Daily Rest Stats for Pet {self.name}.\nException: {e}\nwhile parsing {restJSONDaily}")
+            capture_exception(e)
+            raise TryFiError("Unable to set Pet Daily Rest Stats")
+        except Exception as e:
+            capture_exception(e)
+        try:
+            for sleepAmount in restJSONWeekly['restSummaries'][0]['data']['sleepAmounts']:
+                if sleepAmount['type'] == 'SLEEP':
+                    self._weeklySleep = int(sleepAmount['duration'])
+                if sleepAmount['type'] == 'NAP':
+                    self._weeklyNap = int(sleepAmount['duration'])
+        except TryFiError as e:
+            LOGGER.error(f"Unable to set values Weekly Rest Stats for Pet {self.name}.\nException: {e}\nwhile parsing {restJSONWeekly}")
+            capture_exception(e)
+            raise TryFiError("Unable to set Pet Weekly Rest Stats")
+        except Exception as e:
+            capture_exception(e)
+        try:
+            for sleepAmount in restJSONMonthly['restSummaries'][0]['data']['sleepAmounts']:
+                if sleepAmount['type'] == 'SLEEP':
+                    self._monthlySleep = int(sleepAmount['duration'])
+                if sleepAmount['type'] == 'NAP':
+                    self._monthlyNap = int(sleepAmount['duration'])
+        except TryFiError as e:
+            LOGGER.error(f"Unable to set values Monthly Rest Stats for Pet {self.name}.\nException: {e}\nwhile parsing {restJSONMonthly}")
+            capture_exception(e)
+            raise TryFiError("Unable to set Pet Monthly Rest Stats")
+        except Exception as e:
+            capture_exception(e)
 
     # Update the Stats of the pet
     def updateStats(self, sessionId):
@@ -123,6 +161,16 @@ class FiPet(object):
             return True
         except Exception as e:
             LOGGER.error(f"Could not update stats for Pet {self.name}.\n{e}")
+            capture_exception(e)
+
+    # Update the Stats of the pet
+    def updateRestStats(self, sessionId):
+        try:
+            pRestStatsJSON = query.getCurrentPetRestStats(sessionId,self.petId)
+            self.setRestStats(pRestStatsJSON['dailyStat'],pRestStatsJSON['weeklyStat'],pRestStatsJSON['monthlyStat'])
+            return True
+        except Exception as e:
+            LOGGER.error(f"Could not update rest stats for Pet {self.name}.\n{e}")
             capture_exception(e)
 
     # Update the Pet's GPS location
@@ -152,6 +200,7 @@ class FiPet(object):
         self.updateDeviceDetails(sessionId)
         self.updatePetLocation(sessionId)
         self.updateStats(sessionId)
+        self.updateRestStats(sessionId)
 
     # set the color code of the led light on the pet collar
     def setLedColorCode(self, sessionId, colorCode):
@@ -281,6 +330,26 @@ class FiPet(object):
     @property
     def monthlyTotalDistance(self):
         return self._monthlyTotalDistance
+
+    @property
+    def dailySleep(self):
+        return self._dailySleep
+    @property
+    def weeklySleep(self):
+        return self._weeklySleep
+    @property
+    def monthlySleep(self):
+        return self._monthlySleep
+    @property
+    def dailyNap(self):
+        return self._dailyNap
+    @property
+    def weeklyNap(self):
+        return self._weeklyNap
+    @property
+    def monthlyNap(self):
+        return self._monthlyNap
+
     @property
     def lastUpdated(self):
         return self._lastUpdated
