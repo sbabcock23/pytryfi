@@ -18,12 +18,6 @@ TryFi uses Graphql for its APIs. Essentially, you will use your username (email 
 tryfi = PyTryFi(username, password)
 print(tryfi)
 
-#this will query sleep stats for given pet
-tryfi.pets[0].dailySleep
-
-#this will query nap stats for given pet
-tryfi.pets[0].dailyNap
-
 #this will perform a complete refresh of all Pets and data points
 tryfi.updatePets()
 
@@ -38,6 +32,9 @@ tryfi.pets[0].updatePetLocation(tryfi.session)
 
 #this will update the stats of the pet 
 tryfi.pets[0].updateStats(tryfi.session)
+
+#this will update rest (nap/sleep) stats of the pet 
+tryfi.pets[0].updateRestStats(tryfi.session)
 
 #update the device/collar details for the given pet
 tryfi.pets[0].updateDeviceDetails(tryfi.session)
@@ -60,6 +57,16 @@ tryfi.pets[0].setLostDogMode(tryfi.session,False)
 
 #this will get the lost dog mode status/state currently in the object
 tryfi.pets[0].isLost
+
+#this will query sleep stats for given pet
+tryfi.pets[0].dailySleep
+tryfi.pets[0].weeklySleep
+tryfi.pets[0].monthlySleep
+
+#this will query nap stats for given pet
+tryfi.pets[0].dailyNap
+tryfi.pets[0].weeklyNap
+tryfi.pets[0].monthlyNap
 ```
 
 ## To Do
@@ -69,6 +76,9 @@ tryfi.pets[0].isLost
 * [TryFi](https://tryfi.com/)
 
 # Version History
+# 0.0.15
+* Enhancement - added Sleep and Nap statistics. If the collar doesn't support this feature it defaults to zero.
+
 # 0.0.14
 * Fix - resolved issue between V1 and V2 of the TryFi collars where the isCharging property doesn't exist in V2. This causes failed parsing errors and some users get a ledOn error as a symptom in hass-tryfi (Home Assistant - TryFi implementation)
 
