@@ -32,6 +32,8 @@ class PyTryFi(object):
 
             self._currentUser = FiUser(self._userId)
             self._currentUser.setUserDetails(self._session)
+            self._numberOfHouseHolds = self.setNumberOfHouseholds()
+
             petListJSON = query.getPetList(self._session)
             self._pets = []
             for pet in petListJSON:
@@ -70,6 +72,11 @@ class PyTryFi(object):
             petString = petString + f"{p}"
         return f"TryFi Instance - {instString}\n Pets in Home:\n {petString}\n Bases In Home:\n {baseString}"
         
+    #get # of Households so that I can loop through them
+    def setNumberOfHouseholds(self):
+        householdJSON = query.getUserHouseHolds(self._session)
+        return len(householdJSON)
+    
     #refresh pet details for all pets
     def updatePets(self):
         try:

@@ -16,6 +16,20 @@ def getUserDetail(sessionId):
         LOGGER.error("Error performing query: " + e)
         capture_exception(e)
 
+def getUserHouseHolds(sessionId):
+    try:
+        qString = QUERY_CURRENT_USER_FULL_DETAIL + FRAGMENT_USER_DETAILS \
+            + FRAGMENT_USER_FULL_DETAILS + FRAGMENT_PET_PROFILE + FRAGEMENT_BASE_PET_PROFILE \
+            + FRAGMENT_BASE_DETAILS + FRAGMENT_POSITION_COORDINATES + FRAGMENT_BREED_DETAILS \
+            + FRAGMENT_PHOTO_DETAILS + FRAGMENT_DEVICE_DETAILS + FRAGMENT_LED_DETAILS + FRAGMENT_OPERATIONAL_DETAILS \
+            + FRAGMENT_CONNECTION_STATE_DETAILS
+        response = query(sessionId, qString)
+        LOGGER.debug(f"getUserHouseHolds: {response}")
+        return response['data']['currentUser']['userHouseholds']
+    except Exception as e:
+        LOGGER.error("Error performing question: " + e)
+        capture_exception(e)
+
 def getPetList(sessionId):
     try:
         qString = QUERY_CURRENT_USER_FULL_DETAIL + FRAGMENT_USER_DETAILS \
