@@ -76,6 +76,9 @@ tryfi.pets[0].monthlyNap
 * [TryFi](https://tryfi.com/)
 
 # Version History
+# 0.0.16
+* Fix - removed hardcoding of a single household. Households are iterated through for pets and bases.
+
 # 0.0.15
 * Enhancement - added Sleep and Nap statistics. If the collar doesn't support this feature it defaults to zero.
 

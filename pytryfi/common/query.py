@@ -25,7 +25,7 @@ def getPetList(sessionId):
             + FRAGMENT_CONNECTION_STATE_DETAILS
         response = query(sessionId, qString)
         LOGGER.debug(f"getPetList: {response}")
-        return response['data']['currentUser']['userHouseholds'][0]['household']['pets']
+        return response['data']['currentUser']['userHouseholds']
     except Exception as e:
         LOGGER.error("Error performing query: " + e)
         capture_exception(e)
@@ -39,7 +39,7 @@ def getBaseList(sessionId):
             + FRAGMENT_CONNECTION_STATE_DETAILS
         response = query(sessionId, qString)
         LOGGER.debug(f"getBaseList: {response}")
-        return response['data']['currentUser']['userHouseholds'][0]['household']['bases']
+        return response['data']['currentUser']['userHouseholds']
     except Exception as e:
         LOGGER.error("Error performing query: " + e)
         capture_exception(e)

@@ -1,6 +1,6 @@
 SENTRY_URL = "https://c7618923f758480ca2af05a21123f855@o580516.ingest.sentry.io/5735605"
 
-PYTRYFI_VERSION = "0.0.15"
+PYTRYFI_VERSION = "0.0.16"
 
 API_HOST_URL_BASE   = "https://api.tryfi.com"
 API_GRAPHQL         = "/graphql"
