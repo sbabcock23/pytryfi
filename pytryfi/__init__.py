@@ -32,32 +32,37 @@ class PyTryFi(object):
 
             self._currentUser = FiUser(self._userId)
             self._currentUser.setUserDetails(self._session)
-            self._numberOfHouseHolds = self.setNumberOfHouseholds()
 
             petListJSON = query.getPetList(self._session)
+            h = 0
             self._pets = []
-            for pet in petListJSON:
-                p = FiPet(pet['id'])
-                p.setPetDetailsJSON(pet)
-                #get the current location and set it
-                pLocJSON = query.getCurrentPetLocation(self._session,p._petId)
-                p.setCurrentLocation(pLocJSON)
-                #get the daily, weekly and monthly stats and set
-                pStatsJSON = query.getCurrentPetStats(self._session,p._petId)
-                p.setStats(pStatsJSON['dailyStat'],pStatsJSON['weeklyStat'],pStatsJSON['monthlyStat'])
-                #get the daily, weekly and monthly rest stats and set
-                pRestStatsJSON = query.getCurrentPetRestStats(self._session,p._petId)
-                p.setRestStats(pRestStatsJSON['dailyStat'],pRestStatsJSON['weeklyStat'],pRestStatsJSON['monthlyStat'])
-                LOGGER.debug(f"Adding Pet: {p._name} with Device: {p._device._deviceId}")
-                self._pets.append(p)
+            for house in petListJSON:
+                for pet in petListJSON[h]['household']['pets']:
+                    p = FiPet(pet['id'])
+                    p.setPetDetailsJSON(pet)
+                    #get the current location and set it
+                    pLocJSON = query.getCurrentPetLocation(self._session,p._petId)
+                    p.setCurrentLocation(pLocJSON)
+                    #get the daily, weekly and monthly stats and set
+                    pStatsJSON = query.getCurrentPetStats(self._session,p._petId)
+                    p.setStats(pStatsJSON['dailyStat'],pStatsJSON['weeklyStat'],pStatsJSON['monthlyStat'])
+                    #get the daily, weekly and monthly rest stats and set
+                    pRestStatsJSON = query.getCurrentPetRestStats(self._session,p._petId)
+                    p.setRestStats(pRestStatsJSON['dailyStat'],pRestStatsJSON['weeklyStat'],pRestStatsJSON['monthlyStat'])
+                    LOGGER.debug(f"Adding Pet: {p._name} with Device: {p._device._deviceId}")
+                    self._pets.append(p)
+                h = h + 1
             
             self._bases = []
             baseListJSON = query.getBaseList(self._session)
-            for base in baseListJSON:
-                b = FiBase(base['baseId'])
-                b.setBaseDetailsJSON(base)
-                LOGGER.debug(f"Adding Base: {b._name} Online: {b._online}")
-                self._bases.append(b)
+            h = 0
+            for house in baseListJSON:
+                for base in baseListJSON[h]['household']['bases']:
+                    b = FiBase(base['baseId'])
+                    b.setBaseDetailsJSON(base)
+                    LOGGER.debug(f"Adding Base: {b._name} Online: {b._online}")
+                    self._bases.append(b)
+                h = h + 1
         except Exception as e:
             capture_exception(e)
 
@@ -72,30 +77,28 @@ class PyTryFi(object):
             petString = petString + f"{p}"
         return f"TryFi Instance - {instString}\n Pets in Home:\n {petString}\n Bases In Home:\n {baseString}"
         
-    #get # of Households so that I can loop through them
-    def setNumberOfHouseholds(self):
-        householdJSON = query.getUserHouseHolds(self._session)
-        return len(householdJSON)
-    
     #refresh pet details for all pets
     def updatePets(self):
         try:
             petListJSON = query.getPetList(self._session)
             updatedPets = []
-            for pet in petListJSON:
-                p = FiPet(pet['id'])
-                p.setPetDetailsJSON(pet)
-                #get the current location and set it
-                pLocJSON = query.getCurrentPetLocation(self._session,p._petId)
-                p.setCurrentLocation(pLocJSON)
-                #get the daily, weekly and monthly stats and set
-                pStatsJSON = query.getCurrentPetStats(self._session,p._petId)
-                p.setStats(pStatsJSON['dailyStat'],pStatsJSON['weeklyStat'],pStatsJSON['monthlyStat'])
-                #get the daily, weekly and monthly rest stats and set
-                pRestStatsJSON = query.getCurrentPetRestStats(self._session,p._petId)
-                p.setRestStats(pRestStatsJSON['dailyStat'],pRestStatsJSON['weeklyStat'],pRestStatsJSON['monthlyStat'])
-                LOGGER.debug(f"Adding Pet: {p._name} with Device: {p._device._deviceId}")
-                updatedPets.append(p)
+            h = 0
+            for house in petListJSON:
+                for pet in petListJSON[h]['household']['pets']:
+                    p = FiPet(pet['id'])
+                    p.setPetDetailsJSON(pet)
+                    #get the current location and set it
+                    pLocJSON = query.getCurrentPetLocation(self._session,p._petId)
+                    p.setCurrentLocation(pLocJSON)
+                    #get the daily, weekly and monthly stats and set
+                    pStatsJSON = query.getCurrentPetStats(self._session,p._petId)
+                    p.setStats(pStatsJSON['dailyStat'],pStatsJSON['weeklyStat'],pStatsJSON['monthlyStat'])
+                    #get the daily, weekly and monthly rest stats and set
+                    pRestStatsJSON = query.getCurrentPetRestStats(self._session,p._petId)
+                    p.setRestStats(pRestStatsJSON['dailyStat'],pRestStatsJSON['weeklyStat'],pRestStatsJSON['monthlyStat'])
+                    LOGGER.debug(f"Adding Pet: {p._name} with Device: {p._device._deviceId}")
+                    updatedPets.append(p)
+                h = h + 1
             self._pets = updatedPets
         except Exception as e:
             capture_exception(e)
@@ -130,10 +133,13 @@ class PyTryFi(object):
         try:
             updatedBases = []
             baseListJSON = query.getBaseList(self._session)
-            for base in baseListJSON:
-                b = FiBase(base['baseId'])
-                b.setBaseDetailsJSON(base)
-                updatedBases.append(b)
+            h = 0
+            for house in baseListJSON:
+                for base in baseListJSON[h]['household']['bases']:
+                    b = FiBase(base['baseId'])
+                    b.setBaseDetailsJSON(base)
+                    updatedBases.append(b)
+                h = h + 1
             self._bases = updatedBases
         except Exception as e:
             capture_exception(e)
