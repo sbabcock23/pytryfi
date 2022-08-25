@@ -76,6 +76,8 @@ tryfi.pets[0].monthlyNap
 * [TryFi](https://tryfi.com/)
 
 # Version History
+# 0.0.17
+* Enhancement - added 3 functions to get the Activity Type, Current Place Name and Current Place Address
 # 0.0.16
 * Fix - removed hardcoding of a single household. Households are iterated through for pets and bases.
 
