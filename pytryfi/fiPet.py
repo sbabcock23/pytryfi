@@ -370,6 +370,9 @@ class FiPet(object):
     def areaName(self):
         return self._areaName
     
+    def getActivityType(self):
+        return self.activityType
+
     def getBirthDate(self):
         return datetime.datetime(self.yearOfBirth, self.monthOfBirth, self.dayOfBirth)
     
