@@ -76,6 +76,8 @@ tryfi.pets[0].monthlyNap
 * [TryFi](https://tryfi.com/)
 
 # Version History
+# 0.0.18
+* Maintenance - Removal of walkversion which is being deprecated and no longer required.
 # 0.0.17
 * Enhancement - added 3 functions to get the Activity Type, Current Place Name and Current Place Address
 # 0.0.16
