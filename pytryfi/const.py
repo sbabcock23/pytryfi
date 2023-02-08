@@ -17,7 +17,7 @@ VAR_PET_ID = "__PET_ID__"
 
 QUERY_CURRENT_USER  = "query {\n  currentUser {\n    ...UserDetails\n  }\n}\n"
 QUERY_CURRENT_USER_FULL_DETAIL  = "query {\n  currentUser {\n    ...UserFullDetails\n  }\n}\n"
-QUERY_PET_CURRENT_LOCATION = "query {\n\n  pet (id: \""+VAR_PET_ID+"\") {\n    ongoingActivity(walksVersion: 1) {\n      __typename\n      ...OngoingActivityDetails\n    }\n  }\n}\n"
+QUERY_PET_CURRENT_LOCATION = "query {\n\n  pet (id: \""+VAR_PET_ID+"\") {\n    ongoingActivity {\n      __typename\n      ...OngoingActivityDetails\n    }\n  }\n}\n"
 QUERY_PET_ACTIVITY = "query {\n\n  pet (id: \""+VAR_PET_ID+"\") {\n   \n    dailyStat: currentActivitySummary (period: DAILY) {\n      ...ActivitySummaryDetails\n    }\n    weeklyStat: currentActivitySummary (period: WEEKLY) {\n      ...ActivitySummaryDetails\n    }\n    monthlyStat: currentActivitySummary (period: MONTHLY) {\n      ...ActivitySummaryDetails\n    }\n  }\n}\n"
 QUERY_PET_REST = "query {\n  pet (id: \""+VAR_PET_ID+"\") {\n	dailyStat: restSummaryFeed(cursor: null, period: DAILY, limit: 1) {\n      __typename\n      restSummaries {\n        __typename\n        ...RestSummaryDetails\n      }\n    }\n	weeklyStat: restSummaryFeed(cursor: null, period: WEEKLY, limit: 1) {\n      __typename\n      restSummaries {\n        __typename\n        ...RestSummaryDetails\n      }\n    }\n	monthlyStat: restSummaryFeed(cursor: null, period: MONTHLY, limit: 1) {\n      __typename\n      restSummaries {\n        __typename\n        ...RestSummaryDetails\n      }\n    }\n  }\n}"
 QUERY_PET_DEVICE_DETAILS = "query {\n  pet (id: \""+VAR_PET_ID+"\") {\n    __typename\n    ...PetProfile\n  }\n}\n"
