@@ -38,19 +38,23 @@ class PyTryFi(object):
             self._pets = []
             for house in petListJSON:
                 for pet in petListJSON[h]['household']['pets']:
-                    p = FiPet(pet['id'])
-                    p.setPetDetailsJSON(pet)
-                    #get the current location and set it
-                    pLocJSON = query.getCurrentPetLocation(self._session,p._petId)
-                    p.setCurrentLocation(pLocJSON)
-                    #get the daily, weekly and monthly stats and set
-                    pStatsJSON = query.getCurrentPetStats(self._session,p._petId)
-                    p.setStats(pStatsJSON['dailyStat'],pStatsJSON['weeklyStat'],pStatsJSON['monthlyStat'])
-                    #get the daily, weekly and monthly rest stats and set
-                    pRestStatsJSON = query.getCurrentPetRestStats(self._session,p._petId)
-                    p.setRestStats(pRestStatsJSON['dailyStat'],pRestStatsJSON['weeklyStat'],pRestStatsJSON['monthlyStat'])
-                    LOGGER.debug(f"Adding Pet: {p._name} with Device: {p._device._deviceId}")
-                    self._pets.append(p)
+                    #If pet doesn't have a collar then ignore it. What good is a pet without a collar!
+                    if pet['device'] != "None":
+                        p = FiPet(pet['id'])
+                        p.setPetDetailsJSON(pet)
+                        #get the current location and set it
+                        pLocJSON = query.getCurrentPetLocation(self._session,p._petId)
+                        p.setCurrentLocation(pLocJSON)
+                        #get the daily, weekly and monthly stats and set
+                        pStatsJSON = query.getCurrentPetStats(self._session,p._petId)
+                        p.setStats(pStatsJSON['dailyStat'],pStatsJSON['weeklyStat'],pStatsJSON['monthlyStat'])
+                        #get the daily, weekly and monthly rest stats and set
+                        pRestStatsJSON = query.getCurrentPetRestStats(self._session,p._petId)
+                        p.setRestStats(pRestStatsJSON['dailyStat'],pRestStatsJSON['weeklyStat'],pRestStatsJSON['monthlyStat'])
+                        LOGGER.debug(f"Adding Pet: {p._name} with Device: {p._device._deviceId}")
+                        self._pets.append(p)
+                    else:
+                        LOGGER.warning(f"Pet {pet['name']} - {pet['id']} has no collar. Ignoring Pet!")
                 h = h + 1
             
             self._bases = []
