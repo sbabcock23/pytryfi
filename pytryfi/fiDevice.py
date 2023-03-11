@@ -14,17 +14,16 @@ class FiDevice(object):
             self._moduleId = deviceJSON['moduleId']
             self._buildId = deviceJSON['info']['buildId']
             self._batteryPercent = int(deviceJSON['info']['batteryPercent'])
-
+            
             #V1 of the collar has this parameter but V2 it is missing
             try:
                 self._isCharging = bool(deviceJSON['info']['isCharging'])
             except Exception as e1:
                 self._isCharging = False
-
-            self._batteryHealth = deviceJSON['info']['batteryHealth']
+            
+            #self._batteryHealth = deviceJSON['info']['batteryHealth']  
             self._ledOffAt = self.setLedOffAtDate(deviceJSON['operationParams']['ledOffAt'])
             self._ledOn = self.getAccurateLEDStatus( bool(deviceJSON['operationParams']['ledEnabled']))
-            
             self._mode = deviceJSON['operationParams']['mode']
             self._ledColor = deviceJSON['ledColor']['name']
             self._ledColorHex = deviceJSON['ledColor']['hexCode']
@@ -57,9 +56,10 @@ class FiDevice(object):
     @property
     def batteryPercent(self):
         return self._batteryPercent
-    @property
-    def batteryHealth(self):
-        return self._batteryHealth
+    #This was deprecated in the newer collars
+    #@property
+    #def batteryHealth(self):
+    #    return self._batteryHealth
     @property
     def isCharging(self):
         return self._isCharging
