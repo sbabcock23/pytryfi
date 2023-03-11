@@ -76,6 +76,9 @@ tryfi.pets[0].monthlyNap
 * [TryFi](https://tryfi.com/)
 
 # Version History
+# 0.0.19
+* Breaking Change - removed battery health as its not available in the newer collars and deprecated
+* Fix - If a pet exists and has no collar then ignore. Previously it would attempt to associate a collar that doesn't exist and error out.
 # 0.0.18
 * Maintenance - Removal of walkversion which is being deprecated and no longer required.
 # 0.0.17
