@@ -1,7 +1,7 @@
 import logging
 import requests
 
-from pytryfi.const import (API_HOST_URL_BASE, API_LOGIN, API_GRAPHQL, PYTRYFI_VERSION)
+from pytryfi.const import (API_HOST_URL_BASE, API_LOGIN, PYTRYFI_VERSION, HEADER)
 from pytryfi.fiUser import FiUser
 from pytryfi.fiPet import FiPet
 from pytryfi.fiBase import FiBase
@@ -27,8 +27,10 @@ class PyTryFi(object):
             self._session = requests.Session()
             self._user_agent = "pyTryFi"
             self._username = username
-            self._password = password
+            self._password = password    
             self.login()
+            #set Headers only after login for use going forward.
+            self.setHeaders()
 
             self._currentUser = FiUser(self._userId)
             self._currentUser.setUserDetails(self._session)
@@ -80,7 +82,11 @@ class PyTryFi(object):
         for p in self.pets:
             petString = petString + f"{p}"
         return f"TryFi Instance - {instString}\n Pets in Home:\n {petString}\n Bases In Home:\n {baseString}"
-        
+    
+    #set the headers for the session
+    def setHeaders(self):
+        self.session.headers = HEADER
+
     #refresh pet details for all pets
     def updatePets(self):
         try:
