@@ -102,6 +102,9 @@ tryfi.pets[0].monthlyNap
 
 # Version History
 
+# 0.0.20
+- Fix - Added HTTP Header to the requests of all GraphQL requests
+
 # 0.0.19
 
 - Breaking Change - removed battery health as its not available in the newer collars and deprecated

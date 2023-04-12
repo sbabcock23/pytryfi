@@ -1,5 +1,6 @@
 from pytryfi.const import *
 from pytryfi.exceptions import *
+import json
 import requests
 import logging
 from sentry_sdk import capture_exception
@@ -134,13 +135,14 @@ def mutation(sessionId, qString, qVariables):
     try:
         jsonObject = None
         url = getGraphqlURL()
-        params = {"query": qString, "variables": qVariables}
+       
+        params = {"query": qString, "variables": json.loads(qVariables)}
         jsonObject = execute(url, sessionId, params=params, method='POST').json()
         return jsonObject
     except Exception as e:
         LOGGER.error("Error performing query: " + e)
         capture_exception(e)
-        
+
 def query(sessionId, qString):
     try:
         jsonObject = None
@@ -158,7 +160,7 @@ def execute(url, sessionId, method='GET', params=None, cookies=None):
         if method == 'GET':
             response = sessionId.get(url, params=params)
         elif method == 'POST':
-            response = sessionId.post(url, data=params)
+            response = sessionId.post(url, json=params)
         else:
             raise TryFiError(f"Method Passed was invalid: {method}")
     except requests.RequestException as e:
