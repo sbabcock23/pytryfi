@@ -102,6 +102,9 @@ tryfi.pets[0].monthlyNap
 
 # Version History
 
+# 0.0.21
+- Enchanced error handling of pet information in case its not available
+
 # 0.0.20
 - Fix - Added HTTP Header to the requests of all GraphQL requests
 
