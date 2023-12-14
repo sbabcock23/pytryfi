@@ -15,22 +15,47 @@ class FiPet(object):
     def setPetDetailsJSON(self, petJSON):
         try:
             self._name = petJSON['name']
+        except:
+            LOGGER.warning(f"Unknown Pet Name")
+            self._name = "Unknown Pet Name"
+        try:
             self._homeCityState = petJSON['homeCityState']
+        except:
+            LOGGER.warning(f"Unknown City")
+            self._homeCityState = "FakeCity"
+        try:
             self._yearOfBirth = int(petJSON['yearOfBirth'])
+        except:
+            LOGGER.warning(f"Unknown Year of Birth")
+            self._yearOfBirth = 1900
+        try:
             self._monthOfBirth = int(petJSON['monthOfBirth'])
+        except:
+            LOGGER.warning(f"Unknown Month of Birth")
+            self._monthOfBirth = 1
+        try:
             self._dayOfBirth = int(petJSON['dayOfBirth'])
+        except:
+            LOGGER.warning(f"Unknown day of birth")
+            self._dayOfBirth = 1
+        try:
             self._gender = petJSON['gender']
+        except:
+            LOGGER.warning(f"Unknown Gender")
+            self._gender = "Male"
+        try:
             #weight is in kg
             self._weight = float(petJSON['weight'])
+        except:
+            LOGGER.warning(f"Unknown Weight")
+            self._weight = float(1.00)
+        try:
             self._breed = petJSON['breed']['name']
+        except:
+            LOGGER.warning(f"Unknown Breed of Dog")
+            self._breed = "Dog"
             #track last updated
-            self._lastUpdated = datetime.datetime.now()
-        except TryFiError as e:
-            LOGGER.error(f"Unable to set values for Pet.\nException: {e}\nwhile parsing {petJSON}")
-            capture_exception(e)
-            raise TryFiError("Unable to set Pet Details")
-        except Exception as e:
-            capture_exception(e)
+        self._lastUpdated = datetime.datetime.now()
         try:
             self._photoLink = petJSON['photos']['first']['image']['fullSize']
         except Exception as e:
