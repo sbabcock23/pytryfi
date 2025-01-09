@@ -14,7 +14,7 @@ def getUserDetail(sessionId):
         LOGGER.debug(f"getUserDetails: {response}")
         return response['data']['currentUser']
     except Exception as e:
-        LOGGER.error("Error performing query: " + e)
+        LOGGER.error(f"Error performing query", exc_info=e)
         capture_exception(e)
 
 def getPetList(sessionId):
@@ -28,7 +28,7 @@ def getPetList(sessionId):
         LOGGER.debug(f"getPetList: {response}")
         return response['data']['currentUser']['userHouseholds']
     except Exception as e:
-        LOGGER.error("Error performing query: " + e)
+        LOGGER.error(f"Error performing query", exc_info=e)
         capture_exception(e)
 
 def getBaseList(sessionId):
@@ -42,7 +42,7 @@ def getBaseList(sessionId):
         LOGGER.debug(f"getBaseList: {response}")
         return response['data']['currentUser']['userHouseholds']
     except Exception as e:
-        LOGGER.error("Error performing query: " + e)
+        LOGGER.error(f"Error performing query", exc_info=e)
         capture_exception(e)
 
 def getCurrentPetLocation(sessionId, petId):
@@ -54,7 +54,7 @@ def getCurrentPetLocation(sessionId, petId):
         LOGGER.debug(f"getCurrentPetLocation: {response}")
         return response['data']['pet']['ongoingActivity']
     except Exception as e:
-        LOGGER.error("Error performing query: " + e)
+        LOGGER.error(f"Error performing query", exc_info=e)
         capture_exception(e)
 
 def getCurrentPetStats(sessionId, petId):
@@ -64,7 +64,7 @@ def getCurrentPetStats(sessionId, petId):
         LOGGER.debug(f"getCurrentPetStats: {response}")
         return response['data']['pet']
     except Exception as e:
-        LOGGER.error("Error performing query: " + e)
+        LOGGER.error(f"Error performing query", exc_info=e)
         capture_exception(e)
 
 def getCurrentPetRestStats(sessionId, petId):
@@ -74,7 +74,7 @@ def getCurrentPetRestStats(sessionId, petId):
         LOGGER.debug(f"getCurrentPetStats: {response}")
         return response['data']['pet']
     except Exception as e:
-        LOGGER.error("Error performing query: " + e)
+        LOGGER.error(f"Error performing query", exc_info=e)
         capture_exception(e)
 
 def getDevicedetails(sessionId, petId):
@@ -84,7 +84,7 @@ def getDevicedetails(sessionId, petId):
         LOGGER.debug(f"getDevicedetails: {response}")
         return response['data']['pet']
     except Exception as e:
-        LOGGER.error("Error performing query: " + e)
+        LOGGER.error(f"Error performing query", exc_info=e)
         capture_exception(e)
 
 def setLedColor(sessionId, deviceId, ledColorCode):
@@ -95,7 +95,7 @@ def setLedColor(sessionId, deviceId, ledColorCode):
         LOGGER.debug(f"setLedColor: {response}")
         return response['data']
     except Exception as e:
-        LOGGER.error("Error performing query: " + e)
+        LOGGER.error(f"Error performing query", exc_info=e)
         capture_exception(e)
 
 def turnOnOffLed(sessionId, moduleId, ledEnabled):
@@ -106,7 +106,7 @@ def turnOnOffLed(sessionId, moduleId, ledEnabled):
         LOGGER.debug(f"turnOnOffLed: {response}")
         return response['data']
     except Exception as e:
-        LOGGER.error("Error performing query: " + e)
+        LOGGER.error(f"Error performing query", exc_info=e)
         capture_exception(e)
 
 def setLostDogMode(sessionId, moduleId, action):
@@ -121,14 +121,14 @@ def setLostDogMode(sessionId, moduleId, action):
         LOGGER.debug(f"setLostDogMode: {response}")
         return response['data']
     except Exception as e:
-        LOGGER.error("Error performing query: " + e)
+        LOGGER.error(f"Error performing query", exc_info=e)
         capture_exception(e)
 
 def getGraphqlURL():
     try:
         return API_HOST_URL_BASE + API_GRAPHQL
     except Exception as e:
-        LOGGER.error("Error performing query: " + e)
+        LOGGER.error(f"Error performing query", exc_info=e)
         capture_exception(e)
 
 def mutation(sessionId, qString, qVariables):
@@ -140,7 +140,7 @@ def mutation(sessionId, qString, qVariables):
         jsonObject = execute(url, sessionId, params=params, method='POST').json()
         return jsonObject
     except Exception as e:
-        LOGGER.error("Error performing query: " + e)
+        LOGGER.error(f"Error performing query", exc_info=e)
         capture_exception(e)
 
 def query(sessionId, qString):
@@ -151,7 +151,7 @@ def query(sessionId, qString):
         jsonObject = execute(url, sessionId, params=params).json()
         return jsonObject
     except Exception as e:
-        LOGGER.error("Error performing query: " + e)
+        LOGGER.error(f"Error performing query", exc_info=e)
         capture_exception(e)
 
 def execute(url, sessionId, method='GET', params=None, cookies=None):
