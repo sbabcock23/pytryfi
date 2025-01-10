@@ -62,12 +62,8 @@ class FiPet(object):
             #capture_exception(e)
             LOGGER.warning(f"Cannot find photo of your pet. Defaulting to empty string.")
             self._photoLink = ""
-        try:
-            self._device = FiDevice(petJSON['device']['id'])
-            self._device.setDeviceDetailsJSON(petJSON['device'])
-        except Exception as e:
-            capture_exception(e)
-
+        self._device = FiDevice(petJSON['device']['id'])
+        self._device.setDeviceDetailsJSON(petJSON['device'])
     def __str__(self):
         return f"Last Updated - {self.lastUpdated} - Pet ID: {self.petId} Name: {self.name} Is Lost: {self.isLost} From: {self.homeCityState} ActivityType: {self.activityType} Located: {self.currLatitude},{self.currLongitude} Last Updated: {self.currStartTime}\n \
             using Device/Collar: {self._device}"
@@ -102,6 +98,22 @@ class FiPet(object):
             raise TryFiError("Unable to set Pet Location Details")
         except Exception as e:
             capture_exception(e)
+
+    def setConnectedTo(self, connectedToJSON):
+        connectedToString = ""
+        try:
+            typename = connectedToJSON['__typename']
+            if typename == 'ConnectedToUser':
+                connectedToString = connectedToJSON['user']['firstName'] + " " + connectedToJSON['user']['lastName']
+            elif typename == 'ConnectedToCellular':
+                connectedToString = "Cellular Signal Strength - " + str(connectedToJSON['signalStrengthPercent'])
+            elif typename == 'ConnectedToBase':
+                connectedToString = "Base ID - " + connectedToJSON['chargingBase']['id']
+            else:
+                connectedToString = "unknown"
+            return connectedToString
+        except:
+            return "unknown"
 
     # set the Pet's current steps, goals and distance details for daily, weekly and monthly
     def setStats(self, activityJSONDaily, activityJSONWeekly, activityJSONMonthly):
@@ -391,6 +403,10 @@ class FiPet(object):
     @property
     def areaName(self):
         return self._areaName
+
+    @property
+    def connectedTo(self):
+        return self._connectedTo
     
     def getCurrPlaceName(self):
         return self.currPlaceName
