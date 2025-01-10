@@ -152,6 +152,7 @@ class PyTryFi(object):
                 h = h + 1
             self._bases = updatedBases
         except Exception as e:
+            LOGGER.error("Error fetching bases", exc_info=e)
             capture_exception(e)
 
     # return the pet object based on petId
@@ -228,7 +229,4 @@ class PyTryFi(object):
             LOGGER.debug(f"Successfully logged in. UserId: {self._userId}")
         except requests.RequestException as e:
             LOGGER.error(f"Cannot login, error: ({e})")
-            capture_exception(e)
-            raise requests.RequestException(e)
-        except Exception as e:
-            capture_exception(e)
+            raise e
