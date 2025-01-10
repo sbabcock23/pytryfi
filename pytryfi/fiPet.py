@@ -64,6 +64,8 @@ class FiPet(object):
             self._photoLink = ""
         self._device = FiDevice(petJSON['device']['id'])
         self._device.setDeviceDetailsJSON(petJSON['device'])
+        self._connectedTo = self.setConnectedTo(petJSON['device']['lastConnectionState'])
+
     def __str__(self):
         return f"Last Updated - {self.lastUpdated} - Pet ID: {self.petId} Name: {self.name} Is Lost: {self.isLost} From: {self.homeCityState} ActivityType: {self.activityType} Located: {self.currLatitude},{self.currLongitude} Last Updated: {self.currStartTime}\n \
             using Device/Collar: {self._device}"
@@ -403,7 +405,7 @@ class FiPet(object):
     @property
     def areaName(self):
         return self._areaName
-
+    
     @property
     def connectedTo(self):
         return self._connectedTo
