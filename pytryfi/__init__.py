@@ -92,9 +92,8 @@ class PyTryFi(object):
         try:
             petListJSON = query.getPetList(self._session)
             updatedPets = []
-            h = 0
             for house in petListJSON:
-                for pet in petListJSON[h]['household']['pets']:
+                for pet in house['household']['pets']:
                     p = FiPet(pet['id'])
                     p.setPetDetailsJSON(pet)
                     #get the current location and set it
@@ -108,7 +107,6 @@ class PyTryFi(object):
                     p.setRestStats(pRestStatsJSON['dailyStat'],pRestStatsJSON['weeklyStat'],pRestStatsJSON['monthlyStat'])
                     LOGGER.debug(f"Adding Pet: {p._name} with Device: {p._device._deviceId}")
                     updatedPets.append(p)
-                h = h + 1
             self._pets = updatedPets
         except Exception as e:
             capture_exception(e)
@@ -143,13 +141,11 @@ class PyTryFi(object):
         try:
             updatedBases = []
             baseListJSON = query.getBaseList(self._session)
-            h = 0
             for house in baseListJSON:
-                for base in baseListJSON[h]['household']['bases']:
+                for base in house['household']['bases']:
                     b = FiBase(base['baseId'])
                     b.setBaseDetailsJSON(base)
                     updatedBases.append(b)
-                h = h + 1
             self._bases = updatedBases
         except Exception as e:
             LOGGER.error("Error fetching bases", exc_info=e)
