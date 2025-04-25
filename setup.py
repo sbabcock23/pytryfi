@@ -3,7 +3,6 @@
 import os
 import sys
 from setuptools import setup, find_packages
-from pytryfi.const import PYTRYFI_VERSION
 
 if sys.argv[-1] == 'compile':
     os.system('python setup.py bdist_wheel')
@@ -20,7 +19,6 @@ print(pkg)
 
 setup(
     name="pytryfi", # Replace with your own username
-    version=PYTRYFI_VERSION,
     author="Steve Babcock",
     author_email="steve.w.babcock@gmail.com",
     description="Python Interface for TryFi Dog Collars",
