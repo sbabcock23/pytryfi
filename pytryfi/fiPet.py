@@ -114,7 +114,11 @@ class FiPet(object):
 
     def _extractSleep(self, restObject: dict) -> tuple[int, int]:
         sleep, nap = 0, 0
-        for sleepAmount in restObject['restSummaries'][0]['data']['sleepAmounts']:
+        sleepData = restObject['restSummaries'][0]['data']
+        if not 'sleepAmounts' in sleepData:
+            LOGGER.warning(f"Can't extract sleep because sleepAmounts is missing: {restObject}")
+            return None, None
+        for sleepAmount in sleepData['sleepAmounts']:
             if sleepAmount['type'] == 'SLEEP':
                 sleep = int(sleepAmount['duration'])
             if sleepAmount['type'] == "NAP":
