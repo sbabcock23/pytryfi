@@ -2,6 +2,7 @@ import logging
 import datetime
 from pytryfi.ledColors import ledColors
 from pytryfi.const import PET_MODE_LOST
+from .common.response_handlers import parse_fi_date
 
 LOGGER = logging.getLogger(__name__)
 
@@ -16,6 +17,7 @@ class FiDevice(object):
         self._connectedTo = None
         self._connectionSignalStrength = None
         self._temperature = None
+        self._nextLocationUpdatedExpectedBy = None
     
     def setDeviceDetailsJSON(self, deviceJSON: dict):
         self._moduleId = deviceJSON['moduleId']
@@ -34,9 +36,10 @@ class FiDevice(object):
         self._mode = deviceJSON['operationParams']['mode']
         self._ledColor = deviceJSON['ledColor']['name']
         self._ledColorHex = deviceJSON['ledColor']['hexCode']
-        self._connectionStateDate = datetime.datetime.fromisoformat(str(deviceJSON['lastConnectionState']['date']).replace('Z', '+00:00'))
+        self._connectionStateDate = parse_fi_date(deviceJSON['lastConnectionState']['date'])
         self._connectionStateType = deviceJSON['lastConnectionState']['__typename']
         self._connectedTo = self.setConnectedTo(deviceJSON['lastConnectionState'])
+        self._nextLocationUpdatedExpectedBy = parse_fi_date(deviceJSON['nextLocationUpdateExpectedBy'])
         self._lastUpdated = datetime.datetime.now()
         if 'temperature' in deviceJSON['info']:
             self._temperature = float(deviceJSON['info']['temperature']) / 100 # celcius

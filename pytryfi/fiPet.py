@@ -6,6 +6,7 @@ from pytryfi.const import PET_ACTIVITY_ONGOINGWALK
 from pytryfi.exceptions import *
 from pytryfi.fiDevice import FiDevice
 from sentry_sdk import capture_exception
+from .common.response_handlers import parse_fi_date
 
 LOGGER = logging.getLogger(__name__)
 
@@ -22,6 +23,7 @@ class FiPet(object):
         self._device = None
         self._weight = None
         self._lastUpdated = None
+        self._locationLastUpdate = None
 
     def setPetDetailsJSON(self, petJSON: dict):
         self._name = petJSON.get('name')
@@ -63,6 +65,7 @@ class FiPet(object):
         activityType = activityJSON['__typename']
         self._activityType = activityType
         self._areaName = activityJSON['areaName']
+        self._locationLastUpdate = parse_fi_date(activityJSON['lastReportTimestamp'])
         try:
             if activityType == PET_ACTIVITY_ONGOINGWALK:
                 currentPosition = activityJSON['positions'][-1]['position']
@@ -313,6 +316,13 @@ class FiPet(object):
     @property
     def monthlyNap(self):
         return self._monthlyNap
+    
+    @property
+    def locationLastUpdate(self):
+        return self._locationLastUpdate
+    @property
+    def locationNextEstimatedUpdate(self):
+        return self._device._nextLocationUpdatedExpectedBy
 
     @property
     def lastUpdated(self):
