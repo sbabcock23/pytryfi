@@ -41,7 +41,7 @@ class PyTryFi(object):
             for house in petListJSON:
                 for pet in petListJSON[h]['household']['pets']:
                     #If pet doesn't have a collar then ignore it. What good is a pet without a collar!
-                    if pet['device'] != "None":
+                    if pet['device'] is not None:
                         p = FiPet(pet['id'])
                         p.setPetDetailsJSON(pet)
                         #get the current location and set it
@@ -56,7 +56,7 @@ class PyTryFi(object):
                         LOGGER.debug(f"Adding Pet: {p._name} with Device: {p._device._deviceId}")
                         self._pets.append(p)
                     else:
-                        LOGGER.warning(f"Pet {pet['name']} - {pet['id']} has no collar. Ignoring Pet!")
+                        LOGGER.debug(f"Pet {pet['name']} - {pet['id']} has no collar. Ignoring Pet!")
                 h = h + 1
             
             self._bases = []
@@ -94,6 +94,10 @@ class PyTryFi(object):
             updatedPets = []
             for house in petListJSON:
                 for pet in house['household']['pets']:
+                    # Skip pets without collars
+                    if pet['device'] is None:
+                        LOGGER.debug(f"Pet {pet['name']} - {pet['id']} has no collar. Ignoring Pet!")
+                        continue
                     p = FiPet(pet['id'])
                     p.setPetDetailsJSON(pet)
                     #get the current location and set it
@@ -109,7 +113,9 @@ class PyTryFi(object):
                     updatedPets.append(p)
             self._pets = updatedPets
         except Exception as e:
+            LOGGER.error(f"Error updating pets: {e}", exc_info=True)
             capture_exception(e)
+            raise
 
     def updatePetObject(self, petObj):
         try:
@@ -148,8 +154,9 @@ class PyTryFi(object):
                     updatedBases.append(b)
             self._bases = updatedBases
         except Exception as e:
-            LOGGER.error("Error fetching bases", exc_info=e)
+            LOGGER.error(f"Error fetching bases: {e}", exc_info=True)
             capture_exception(e)
+            raise
 
     # return the pet object based on petId
     def getBase(self, baseId):
@@ -163,8 +170,53 @@ class PyTryFi(object):
             capture_exception(e)
 
     def update(self):
-        self.updateBases()
-        self.updatePets()
+        """Update all data - both bases and pets"""
+        errors = []
+        retry_auth = False
+        
+        try:
+            self.updateBases()
+        except Exception as e:
+            if self._is_auth_error(e):
+                retry_auth = True
+            errors.append(f"Base update failed: {e}")
+            
+        try:
+            self.updatePets()
+        except Exception as e:
+            if self._is_auth_error(e):
+                retry_auth = True
+            errors.append(f"Pet update failed: {e}")
+            
+        # If we got auth errors, try to re-authenticate once
+        if retry_auth:
+            LOGGER.info("Authentication error detected, attempting to re-authenticate")
+            try:
+                self.login()
+                # Retry the updates after re-authentication
+                errors = []
+                try:
+                    self.updateBases()
+                except Exception as e:
+                    errors.append(f"Base update failed after re-auth: {e}")
+                    
+                try:
+                    self.updatePets()
+                except Exception as e:
+                    errors.append(f"Pet update failed after re-auth: {e}")
+                    
+            except Exception as e:
+                errors.append(f"Re-authentication failed: {e}")
+            
+        if errors:
+            error_msg = "; ".join(errors)
+            raise Exception(f"TryFi update failed: {error_msg}")
+    
+    def _is_auth_error(self, error):
+        """Check if an error is authentication related"""
+        error_str = str(error).lower()
+        auth_indicators = ['401', '403', 'unauthorized', 'forbidden', 'authentication', 'auth']
+        return any(indicator in error_str for indicator in auth_indicators)
 
     @property
     def currentUser(self):
