@@ -1,4 +1,4 @@
-# pytryfi - Python Interface for TryFi
+````# pytryfi - Python Interface for TryFi
 
 This python interface enables you to gather information about your dogs whereabouts, your user details and any bases you may have.
 
@@ -90,7 +90,73 @@ tryfi.pets[0].monthlySleep
 tryfi.pets[0].dailyNap
 tryfi.pets[0].weeklyNap
 tryfi.pets[0].monthlyNap
+
+#get the pet name
+tryfi.pets[0].name
 ```
+### Fetch Historical Activity and Rest Data
+
+The GraphQL API exposes daily history feeds for activity and rest. You can reuse the bundled fragments to build queries and iterate the results. Example below pulls the latest 30 days for the first pet.
+
+```python
+from pytryfi import PyTryFi
+from pytryfi.common import query
+from pytryfi.const import (
+    FRAGMENT_ACTIVITY_SUMMARY_DETAILS,
+    FRAGMENT_REST_SUMMARY_DETAILS,
+)
+
+tryfi = PyTryFi(username, password)
+pet = tryfi.pets[0]
+limit_days = 30
+
+activity_history_query = (
+        "query {"
+        "  pet (id: \"" + pet.petId + "\") {"
+        "    activitySummaryFeed(cursor: null, period: DAILY, limit: "
+        + str(limit_days)
+        + ") {"
+        "      __typename"
+        "      activitySummaries {"
+        "        __typename"
+        "        ...ActivitySummaryDetails"
+        "      }"
+        "    }"
+        "  }"
+        "}\n"
+        + FRAGMENT_ACTIVITY_SUMMARY_DETAILS
+    )
+
+activity_response = query.query(tryfi.session, activity_history_query)
+for summary in activity_response["data"]["pet"]["activitySummaryFeed"]["activitySummaries"]:
+    print(summary["start"], summary["totalSteps"], summary["stepGoal"])
+
+rest_history_query = (
+        "query {"
+        "  pet (id: \"" + pet.petId + "\") {"
+        "    restSummaryFeed(cursor: null, period: DAILY, limit: "
+        + str(limit_days)
+        + ") {"
+        "      __typename"
+        "      restSummaries {"
+        "        __typename"
+        "        ...RestSummaryDetails"
+        "      }"
+        "    }"
+        "  }"
+        "}\n"
+        + FRAGMENT_REST_SUMMARY_DETAILS
+    )
+
+rest_response = query.query(tryfi.session, rest_history_query)
+for summary in rest_response["data"]["pet"]["restSummaryFeed"]["restSummaries"]:
+    sleep_amounts = summary.get("data", {}).get("sleepAmounts", [])
+    sleep_minutes = next((item.get("duration") for item in sleep_amounts if item.get("type") == "SLEEP"), 0)
+    nap_minutes = next((item.get("duration") for item in sleep_amounts if item.get("type") == "NAP"), 0)
+    print(summary["start"], sleep_minutes, nap_minutes)
+```
+
+Set `limit_days` as needed (TryFi currently caps the feed around 90 days) or switch `period` to `WEEKLY`/`MONTHLY` for alternate rollups.````
 
 ## To Do
 
