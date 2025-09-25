@@ -1,4 +1,4 @@
-````# pytryfi - Python Interface for TryFi
+# pytryfi - Python Interface for TryFi
 
 This python interface enables you to gather information about your dogs whereabouts, your user details and any bases you may have.
 
@@ -91,9 +91,45 @@ tryfi.pets[0].dailyNap
 tryfi.pets[0].weeklyNap
 tryfi.pets[0].monthlyNap
 
-#get the pet name
+#get basic info
+tryfi.pets[0].petId
 tryfi.pets[0].name
+tryfi.pets[0].breed
+tryfi.pets[0].gender
+tryfi.pets[0].weight
+tryfi.pets[0].photoLink
+tryfi.pets[0].homeCityState
+tryfi.pets[0].yearOfBirth
+tryfi.pets[0].monthOfBirth
+tryfi.pets[0].dayOfBirth
+
+#get device and location info
+tryfi.pets[0].device
+tryfi.pets[0].currLongitude
+tryfi.pets[0].currLatitude
+tryfi.pets[0].currStartTime
+tryfi.pets[0].currPlaceName
+tryfi.pets[0].currPlaceAddress
+tryfi.pets[0].areaName
+
+#get activity & metrics
+tryfi.pets[0].activityType
+tryfi.pets[0].connectedTo
+tryfi.pets[0].dailyGoal
+tryfi.pets[0].dailySteps
+tryfi.pets[0].dailyTotalDistance
+tryfi.pets[0].weeklyGoal
+tryfi.pets[0].weeklySteps
+tryfi.pets[0].weeklyTotalDistance
+tryfi.pets[0].monthlyGoal
+tryfi.pets[0].monthlySteps
+tryfi.pets[0].monthlyTotalDistance
+
+#get status info
+tryfi.pets[0].lastUpdated
+
 ```
+
 ### Fetch Historical Activity and Rest Data
 
 The GraphQL API exposes daily history feeds for activity and rest. You can reuse the bundled fragments to build queries and iterate the results. Example below pulls the latest 30 days for the first pet.
@@ -156,7 +192,7 @@ for summary in rest_response["data"]["pet"]["restSummaryFeed"]["restSummaries"]:
     print(summary["start"], sleep_minutes, nap_minutes)
 ```
 
-Set `limit_days` as needed (TryFi currently caps the feed around 90 days) or switch `period` to `WEEKLY`/`MONTHLY` for alternate rollups.````
+Set `limit_days` as needed (TryFi currently caps the feed around 90 days) or switch `period` to `WEEKLY`/`MONTHLY` for alternate rollups.
 
 ## To Do
 
