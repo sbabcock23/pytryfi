@@ -1,48 +1,73 @@
 import logging
 import datetime
 from pytryfi.ledColors import ledColors
-from pytryfi.const import PET_MODE_NORMAL, PET_MODE_LOST
+from pytryfi.const import PET_MODE_LOST
+from .common.response_handlers import parse_fi_date
 
 LOGGER = logging.getLogger(__name__)
 
 class FiDevice(object):
     def __init__(self, deviceId):
         self._deviceId = deviceId
+        self._moduleId = None
+        self._buildId = None
+        self._batteryPercent = None
+        self._isCharging = None
+        self._availableLedColors = []
+        self._connectedTo = None
+        self._connectionSignalStrength = None
+        self._temperature = None
+        self._nextLocationUpdatedExpectedBy = None
     
-    def setDeviceDetailsJSON(self, deviceJSON):
-        try:
-            self._moduleId = deviceJSON['moduleId']
-            self._buildId = deviceJSON['info']['buildId']
-            self._batteryPercent = int(deviceJSON['info']['batteryPercent'])
-            
-            #V1 of the collar has this parameter but V2 it is missing
-            try:
-                self._isCharging = bool(deviceJSON['info']['isCharging'])
-            except Exception as e1:
-                self._isCharging = False
-            
-            #self._batteryHealth = deviceJSON['info']['batteryHealth']  
-            self._ledOffAt = self.setLedOffAtDate(deviceJSON['operationParams']['ledOffAt'])
-            self._ledOn = self.getAccurateLEDStatus( bool(deviceJSON['operationParams']['ledEnabled']))
-            self._mode = deviceJSON['operationParams']['mode']
-            self._ledColor = deviceJSON['ledColor']['name']
-            self._ledColorHex = deviceJSON['ledColor']['hexCode']
-            self._connectionStateDate = datetime.datetime.fromisoformat(str(deviceJSON['lastConnectionState']['date']).replace('Z', '+00:00'))
-            self._connectionStateType = deviceJSON['lastConnectionState']['__typename']
-            self._availableLedColors = []
-            self._lastUpdated = datetime.datetime.now()
+    def setDeviceDetailsJSON(self, deviceJSON: dict):
+        self._moduleId = deviceJSON['moduleId']
+        self._buildId = deviceJSON['info']['buildId']
+        self._batteryPercent = int(deviceJSON['info']['batteryPercent'])
+        
+        #V1 of the collar has this parameter but V2 it is missing
+        if 'isCharging' in deviceJSON['info']:
+            self._isCharging = bool(deviceJSON['info']['isCharging'])
+        else:
+            self._isCharging = None
+
+        #self._batteryHealth = deviceJSON['info']['batteryHealth']  
+        self._ledOffAt = self.setLedOffAtDate(deviceJSON['operationParams']['ledOffAt'])
+        self._ledOn = self.getAccurateLEDStatus( bool(deviceJSON['operationParams']['ledEnabled']))
+        self._mode = deviceJSON['operationParams']['mode']
+        self._ledColor = deviceJSON['ledColor']['name']
+        self._ledColorHex = deviceJSON['ledColor']['hexCode']
+        self._connectionStateDate = parse_fi_date(deviceJSON['lastConnectionState']['date'])
+        self._connectionStateType = deviceJSON['lastConnectionState']['__typename']
+        self._connectedTo = self.setConnectedTo(deviceJSON['lastConnectionState'])
+        self._nextLocationUpdatedExpectedBy = parse_fi_date(deviceJSON['nextLocationUpdateExpectedBy'])
+        self._lastUpdated = datetime.datetime.now()
+        if 'temperature' in deviceJSON['info']:
+            self._temperature = float(deviceJSON['info']['temperature']) / 100 # celcius
+        if 'availableLedColors' in deviceJSON:
             for cString in deviceJSON['availableLedColors']:
                 c = ledColors(int(cString['ledColorCode']),cString['hexCode'], cString['name'] )
                 self._availableLedColors.append(c)
-        except Exception as e:
-            LOGGER.debug(f"tryfi Error: {e}")
-            capture_exception(e)
 
     def __str__(self):
         return f"Last Updated - {self.lastUpdated} - Device ID: {self.deviceId} Device Mode: {self.mode} Battery Left: {self.batteryPercent}% LED State: {self.ledOn} Last Connected: {self.connectionStateDate} by: {self.connectionStateType}"
 
+    def setConnectedTo(self, connectedToJSON):
+        connectedToString = ""
+        typename = connectedToJSON['__typename']
+        self._connectionSignalStrength = None
+        if typename == 'ConnectedToUser':
+            connectedToString = connectedToJSON['user']['firstName'] + " " + connectedToJSON['user']['lastName']
+        elif typename == 'ConnectedToCellular':
+            connectedToString = "Cellular"
+            self._connectionSignalStrength = connectedToJSON['signalStrengthPercent']
+        elif typename == 'ConnectedToBase':
+            connectedToString = "Base ID - " + connectedToJSON['chargingBase']['id']
+        else:
+            connectedToString = None
+        return connectedToString
+
     @property
-    def deviceId(self):
+    def deviceId(self) -> str:
         return self._deviceId
     @property
     def moduleId(self):
@@ -56,6 +81,9 @@ class FiDevice(object):
     @property
     def batteryPercent(self):
         return self._batteryPercent
+    @property
+    def temperature(self):
+        return self._temperature
     #This was deprecated in the newer collars
     #@property
     #def batteryHealth(self):
@@ -70,7 +98,7 @@ class FiDevice(object):
     def ledOffAt(self):
         return self._ledOffAt
     @property
-    def ledColor(self):
+    def ledColor(self) -> ledColors:
         return self._ledColor
     @property
     def ledColorHex(self):
@@ -82,21 +110,24 @@ class FiDevice(object):
     def connectionStateType(self):
         return self._connectionStateType
     @property
-    def availableLedColors(self):
+    def connectedTo(self):
+        return self._connectedTo
+    @property
+    def availableLedColors(self) -> list[ledColors]:
         return self._availableLedColors
     @property
-    def lastUpdated(self):
+    def lastUpdated(self) -> datetime.datetime:
         return self._lastUpdated
     @property
-    def isLost(self):
+    def isLost(self) -> bool:
         if self._mode == PET_MODE_LOST:
             return True
         else:
             return False
 
-#This is created because if TryFi automatically turns off the LED, the status is still set to true in the api.
-#This will compare the dates to see if the current date/time is greater than the turnoffat time in the api.
-    def getAccurateLEDStatus(self, ledStatus):
+    #This is created because if TryFi automatically turns off the LED, the status is still set to true in the api.
+    #This will compare the dates to see if the current date/time is greater than the turnoffat time in the api.
+    def getAccurateLEDStatus(self, ledStatus: bool):
         if ledStatus is False:
             LOGGER.debug("getAccurateLedStatus: LED Status is False")
             return False

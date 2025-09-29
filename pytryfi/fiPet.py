@@ -1,16 +1,29 @@
 import datetime
 import logging
+import requests
 from pytryfi.common import query
 from pytryfi.const import PET_ACTIVITY_ONGOINGWALK
 from pytryfi.exceptions import *
 from pytryfi.fiDevice import FiDevice
 from sentry_sdk import capture_exception
+from .common.response_handlers import parse_fi_date
 
 LOGGER = logging.getLogger(__name__)
 
 class FiPet(object):
     def __init__(self, petId):
         self._petId = petId
+        self._name = None
+        self._homeCityState = None
+        self._yearOfBirth = None
+        self._monthOfBirth = None
+        self._gender = None
+        self._currPlaceName = None
+        self._currPlaceAddress = None
+        self._device = None
+        self._weight = None
+        self._lastUpdated = None
+        self._locationLastUpdate = None
 
     def setPetDetailsJSON(self, petJSON: dict):
         self._name = petJSON.get('name')
@@ -32,13 +45,7 @@ class FiPet(object):
             self._dayOfBirth = None
         self._gender = petJSON.get('gender')
         self._weight = float(petJSON['weight']) if 'weight' in petJSON else None
-        try:
-            self._breed = petJSON['breed']['name']
-        except:
-            LOGGER.warning(f"Unknown Breed of Dog")
-            self._breed = None
-            #track last updated
-        self._lastUpdated = datetime.datetime.now()
+        self._breed = petJSON['breed'].get('name') if 'breed' in petJSON else None
         try:
             self._photoLink = petJSON['photos']['first']['image']['fullSize']
         except Exception as e:
@@ -47,7 +54,7 @@ class FiPet(object):
             self._photoLink = ""
         self._device = FiDevice(petJSON['device']['id'])
         self._device.setDeviceDetailsJSON(petJSON['device'])
-        self._connectedTo = self.setConnectedTo(petJSON['device']['lastConnectionState'])
+        self._lastUpdated = datetime.datetime.now()
 
     def __str__(self):
         return f"Last Updated - {self.lastUpdated} - Pet ID: {self.petId} Name: {self.name} Is Lost: {self.isLost} From: {self.homeCityState} ActivityType: {self.activityType} Located: {self.currLatitude},{self.currLongitude} Last Updated: {self.currStartTime}\n \
@@ -58,43 +65,27 @@ class FiPet(object):
         activityType = activityJSON['__typename']
         self._activityType = activityType
         self._areaName = activityJSON['areaName']
+        self._locationLastUpdate = parse_fi_date(activityJSON['lastReportTimestamp'])
         try:
             if activityType == PET_ACTIVITY_ONGOINGWALK:
-                positionSize = len(activityJSON['positions'])
-                currentPosition = activityJSON['positions'][positionSize-1]['position']
-                self._currLongitude = float(currentPosition['longitude'])
-                self._currLatitude = float(currentPosition['latitude'])          
+                currentPosition = activityJSON['positions'][-1]['position']
             else:
-                self._currLongitude = float(activityJSON['position']['longitude'])
-                self._currLatitude = float(activityJSON['position']['latitude'])
+                currentPosition = activityJSON['position']
+
+            self._currLongitude = float(currentPosition['longitude'])
+            self._currLatitude = float(currentPosition['latitude'])
             self._currStartTime = datetime.datetime.fromisoformat(activityJSON['start'].replace('Z', '+00:00'))
 
-            if 'place' in activityJSON:
+            if 'place' in activityJSON and activityJSON['place'] != None:
                 self._currPlaceName = activityJSON['place']['name']
                 self._currPlaceAddress = activityJSON['place']['address']
             else:
                 self._currPlaceName = None
                 self._currPlaceAddress = None
             self._lastUpdated = datetime.datetime.now()
-        except TryFiError as e:
-            capture_exception(e)
-            LOGGER.error(f"Unable to set values Current Location for Pet {self.name}.\nException: {e}\nwhile parsing {activityJSON}")
-            raise TryFiError("Unable to set Pet Location Details")
         except Exception as e:
-            capture_exception(e)
-
-    def setConnectedTo(self, connectedToJSON):
-        connectedToString = ""
-        typename = connectedToJSON['__typename']
-        if typename == 'ConnectedToUser':
-            connectedToString = connectedToJSON['user']['firstName'] + " " + connectedToJSON['user']['lastName']
-        elif typename == 'ConnectedToCellular':
-            connectedToString = "Cellular Signal Strength - " + str(connectedToJSON['signalStrengthPercent'])
-        elif typename == 'ConnectedToBase':
-            connectedToString = "Base ID - " + connectedToJSON['chargingBase']['id']
-        else:
-            connectedToString = None
-        return connectedToString
+            LOGGER.error(f"Unable to set values Current Location for Pet {self.name}.\nException: {e}\nwhile parsing {activityJSON}")
+            raise TryFiError("Unable to set Pet Location Details") from e
 
     # set the Pet's current steps, goals and distance details for daily, weekly and monthly
     def setStats(self, activityJSONDaily, activityJSONWeekly, activityJSONMonthly):
@@ -102,63 +93,19 @@ class FiPet(object):
         self._dailyGoal = int(activityJSONDaily['stepGoal'])
         self._dailySteps = int(activityJSONDaily['totalSteps'])
         self._dailyTotalDistance = float(activityJSONDaily['totalDistance'])
-        self._weeklyGoal = int(activityJSONWeekly['stepGoal'])
-        self._weeklySteps = int(activityJSONWeekly['totalSteps'])
-        self._weeklyTotalDistance = float(activityJSONWeekly['totalDistance'])
-        self._monthlyGoal = int(activityJSONMonthly['stepGoal'])
-        self._monthlySteps = int(activityJSONMonthly['totalSteps'])
-        self._monthlyTotalDistance = float(activityJSONMonthly['totalDistance'])
+        if activityJSONWeekly:
+            self._weeklyGoal = int(activityJSONWeekly['stepGoal'])
+            self._weeklySteps = int(activityJSONWeekly['totalSteps'])
+            self._weeklyTotalDistance = float(activityJSONWeekly['totalDistance'])
+        if activityJSONMonthly:
+            self._monthlyGoal = int(activityJSONMonthly['stepGoal'])
+            self._monthlySteps = int(activityJSONMonthly['totalSteps'])
+            self._monthlyTotalDistance = float(activityJSONMonthly['totalDistance'])
 
         self._lastUpdated = datetime.datetime.now()
 
-    # set the Pet's current rest details for daily, weekly and monthly
-    def setRestStats(self, restJSONDaily, restJSONWeekly, restJSONMonthly):
-        #setting default values to zero in case this feature is not supported by older collars
-        self._dailyNap = 0
-        self._dailySleep = 0
-        self._weeklyNap = 0
-        self._weeklySleep = 0
-        self._monthlyNap = 0
-        self._monthlySleep = 0
-        try:
-            for sleepAmount in restJSONDaily['restSummaries'][0]['data']['sleepAmounts']:
-                if sleepAmount['type'] == 'SLEEP':
-                    self._dailySleep = int(sleepAmount['duration'])
-                if sleepAmount['type'] == "NAP":
-                    self._dailyNap = int(sleepAmount['duration'])
-        except TryFiError as e:
-            LOGGER.error(f"Unable to set values Daily Rest Stats for Pet {self.name}.\nException: {e}\nwhile parsing {restJSONDaily}")
-            capture_exception(e)
-            raise TryFiError("Unable to set Pet Daily Rest Stats")
-        except Exception as e:
-            capture_exception(e)
-        try:
-            for sleepAmount in restJSONWeekly['restSummaries'][0]['data']['sleepAmounts']:
-                if sleepAmount['type'] == 'SLEEP':
-                    self._weeklySleep = int(sleepAmount['duration'])
-                if sleepAmount['type'] == 'NAP':
-                    self._weeklyNap = int(sleepAmount['duration'])
-        except TryFiError as e:
-            LOGGER.error(f"Unable to set values Weekly Rest Stats for Pet {self.name}.\nException: {e}\nwhile parsing {restJSONWeekly}")
-            capture_exception(e)
-            raise TryFiError("Unable to set Pet Weekly Rest Stats")
-        except Exception as e:
-            capture_exception(e)
-        try:
-            for sleepAmount in restJSONMonthly['restSummaries'][0]['data']['sleepAmounts']:
-                if sleepAmount['type'] == 'SLEEP':
-                    self._monthlySleep = int(sleepAmount['duration'])
-                if sleepAmount['type'] == 'NAP':
-                    self._monthlyNap = int(sleepAmount['duration'])
-        except TryFiError as e:
-            LOGGER.error(f"Unable to set values Monthly Rest Stats for Pet {self.name}.\nException: {e}\nwhile parsing {restJSONMonthly}")
-            capture_exception(e)
-            raise TryFiError("Unable to set Pet Monthly Rest Stats")
-        except Exception as e:
-            capture_exception(e)
-
     # Update the Stats of the pet
-    def updateStats(self, sessionId):
+    def updateStats(self, sessionId: requests.Session):
         try:
             pStatsJSON = query.getCurrentPetStats(sessionId,self.petId)
             self.setStats(pStatsJSON['dailyStat'],pStatsJSON['weeklyStat'],pStatsJSON['monthlyStat'])
@@ -166,19 +113,36 @@ class FiPet(object):
         except Exception as e:
             LOGGER.error(f"Could not update stats for Pet {self.name}.\n{e}")
             capture_exception(e)
+            return False
+
+    def _extractSleep(self, restObject: dict) -> tuple[int, int]:
+        sleep, nap = 0, 0
+        sleepData = restObject['restSummaries'][0]['data']
+        if not 'sleepAmounts' in sleepData:
+            LOGGER.warning(f"Can't extract sleep because sleepAmounts is missing: {restObject}")
+            return None, None
+        for sleepAmount in sleepData['sleepAmounts']:
+            if sleepAmount['type'] == 'SLEEP':
+                sleep = int(sleepAmount['duration'])
+            if sleepAmount['type'] == "NAP":
+                nap = int(sleepAmount['duration'])
+        return sleep, nap
 
     # Update the Stats of the pet
-    def updateRestStats(self, sessionId):
+    def updateRestStats(self, sessionId: requests.Session):
         try:
             pRestStatsJSON = query.getCurrentPetRestStats(sessionId,self.petId)
-            self.setRestStats(pRestStatsJSON['dailyStat'],pRestStatsJSON['weeklyStat'],pRestStatsJSON['monthlyStat'])
+            self._dailySleep, self._dailyNap = self._extractSleep(pRestStatsJSON['dailyStat'])
+            self._weeklySleep, self._weeklyNap = self._extractSleep(pRestStatsJSON['weeklyStat'])
+            self._monthlySleep, self._monthlyNap = self._extractSleep(pRestStatsJSON['monthlyStat'])
             return True
         except Exception as e:
-            LOGGER.error(f"Could not update rest stats for Pet {self.name}.\n{e}")
+            LOGGER.error(f"Could not update rest stats for Pet {self.name}\n{pRestStatsJSON}.\n{e}", exc_info=True)
             capture_exception(e)
+            return False
 
     # Update the Pet's GPS location
-    def updatePetLocation(self, sessionId):
+    def updatePetLocation(self, sessionId: requests.Session):
         try:
             pLocJSON = query.getCurrentPetLocation(sessionId,self.petId)
             self.setCurrentLocation(pLocJSON)
@@ -189,7 +153,7 @@ class FiPet(object):
             return False
     
     # Update the device/collar details for this pet
-    def updateDeviceDetails(self, sessionId):
+    def updateDeviceDetails(self, sessionId: requests.Session):
         try:
             deviceJSON = query.getDevicedetails(sessionId, self.petId)
             self.device.setDeviceDetailsJSON(deviceJSON['device'])
@@ -200,14 +164,17 @@ class FiPet(object):
             return False
 
     # Update all details regarding this pet
-    def updateAllDetails(self, sessionId):
-        self.updateDeviceDetails(sessionId)
-        self.updatePetLocation(sessionId)
-        self.updateStats(sessionId)
-        self.updateRestStats(sessionId)
+    def updateAllDetails(self, sessionId: requests.Session):
+        petJson = query.getPetAllInfo(sessionId, self.petId)
+        self.device.setDeviceDetailsJSON(petJson['device'])
+        self.setCurrentLocation(petJson['ongoingActivity'])
+        self.setStats(petJson['dailyStepStat'], petJson['weeklyStepStat'], petJson['monthlyStepStat'])
+        # TODO: Support weekly
+        self._dailySleep, self._dailyNap = self._extractSleep(petJson['dailySleepStat'])
+        self._monthlySleep, self._monthlyNap = self._extractSleep(petJson['monthlySleepStat'])
 
     # set the color code of the led light on the pet collar
-    def setLedColorCode(self, sessionId, colorCode):
+    def setLedColorCode(self, sessionId: requests.Session, colorCode):
         try:
             moduleId = self.device.moduleId
             ledColorCode = int(colorCode)
@@ -349,6 +316,13 @@ class FiPet(object):
     @property
     def monthlyNap(self):
         return self._monthlyNap
+    
+    @property
+    def locationLastUpdate(self):
+        return self._locationLastUpdate
+    @property
+    def locationNextEstimatedUpdate(self):
+        return self._device._nextLocationUpdatedExpectedBy
 
     @property
     def lastUpdated(self):
@@ -364,9 +338,9 @@ class FiPet(object):
         return self._areaName
     
     @property
-    def connectedTo(self):
-        return self._connectedTo
-    
+    def signalStrength(self):
+        return self._connectionSignalStrength
+
     def getCurrPlaceName(self):
         return self.currPlaceName
     

@@ -6,17 +6,14 @@ class FiBase(object):
         self._baseId = baseId
     
     def setBaseDetailsJSON(self, baseJSON):
-        try:
-            self._name = baseJSON['name']
-            self._latitude = baseJSON['position']['latitude']
-            self._longitude = baseJSON['position']['longitude']
-            self._online = baseJSON['online']
-            self._onlineQuality = baseJSON['onlineQuality']
-            self._lastUpdated = baseJSON['infoLastUpdated']
-            self._networkName = baseJSON['networkName']
-            self._lastUpdated = datetime.datetime.now()
-        except Exception as e:
-            capture_exception(e)
+        self._name = baseJSON['name']
+        self._latitude = baseJSON['position']['latitude']
+        self._longitude = baseJSON['position']['longitude']
+        self._online = baseJSON['online']
+        self._onlineQuality = baseJSON['onlineQuality']
+        self._lastUpdated = baseJSON['infoLastUpdated']
+        self._networkName = baseJSON['networkName']
+        self._lastUpdated = datetime.datetime.now()
 
     def __str__(self):
         return f"Last Updated - {self.lastUpdated} - Base ID: {self.baseId} Name: {self.name} Online Status: {self.online} Wifi Network: {self.networkname} Located: {self.latitude},{self.longitude}"
