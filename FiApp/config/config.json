@@ -1,0 +1,26 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "RDF6*KUD.BRQrbJ!k8tTR-FDEJ*!DxhEu99fR@@KYGKDcvbRqjxcJtiq*Kn!tvjx-Y.gDL8raLZZ2",
+    "port": 5433,
+    "database": "Fi_Collar_Data",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "postgres",
+    "password": "RDF6*KUD.BRQrbJ!k8tTR-FDEJ*!DxhEu99fR@@KYGKDcvbRqjxcJtiq*Kn!tvjx-Y.gDL8raLZZ2",
+    "port": 5433,
+    "database": "Fi_Collar_Data",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "postgres",
+    "password": "RDF6*KUD.BRQrbJ!k8tTR-FDEJ*!DxhEu99fR@@KYGKDcvbRqjxcJtiq*Kn!tvjx-Y.gDL8raLZZ2",
+    "port": 5433,
+    "database": "Fi_Collar_Data",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  }
+}
