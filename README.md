@@ -99,6 +99,8 @@ tryfi.pets[0].gender
 tryfi.pets[0].weight
 tryfi.pets[0].photoLink
 tryfi.pets[0].homeCityState
+tryfi.pets[0].homeCity
+tryfi.pets[0].homeState
 tryfi.pets[0].yearOfBirth
 tryfi.pets[0].monthOfBirth
 tryfi.pets[0].dayOfBirth

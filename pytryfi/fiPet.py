@@ -15,6 +15,8 @@ class FiPet(object):
         self._petId = petId
         self._name = None
         self._homeCityState = None
+        self._homeCity = None
+        self._homeState = None
         self._yearOfBirth = None
         self._monthOfBirth = None
         self._gender = None
@@ -27,7 +29,10 @@ class FiPet(object):
 
     def setPetDetailsJSON(self, petJSON: dict):
         self._name = petJSON.get('name')
-        self._homeCityState = petJSON.get('homeCityState')
+        homeLocation = petJSON.get('homeLocation') or {}
+        self._homeCityState = homeLocation.get('cityState')
+        self._homeCity = homeLocation.get('city')
+        self._homeState = homeLocation.get('state')
         try:
             self._yearOfBirth = int(petJSON['yearOfBirth'])
         except:
@@ -234,6 +239,12 @@ class FiPet(object):
     @property
     def homeCityState(self):
         return self._homeCityState
+    @property
+    def homeCity(self):
+        return self._homeCity
+    @property
+    def homeState(self):
+        return self._homeState
     @property
     def yearOfBirth(self):
         return self._yearOfBirth
