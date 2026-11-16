@@ -40,7 +40,7 @@ def getCurrentPetLocation(session: requests.Session, petId: str):
 
 def getPetAllInfo(session: requests.Session, petId: str):
     qString = QUERY_PET_ACTIVE_DETAILS.replace(VAR_PET_ID, petId) + FRAGMENT_ACTIVITY_SUMMARY_DETAILS + FRAGMENT_ONGOING_ACTIVITY_DETAILS + FRAGMENT_OPERATIONAL_DETAILS + FRAGMENT_CONNECTION_STATE_DETAILS + FRAGMENT_LED_DETAILS \
-        + FRAGMENT_REST_SUMMARY_DETAILS + FRAGMENT_POSITION_COORDINATES + FRAGMENT_LOCATION_POINT + FRAGMENT_USER_DETAILS + FRAGMENT_PLACE_DETAILS
+        + FRAGMENT_REST_FEED_DETAILS + FRAGMENT_POSITION_COORDINATES + FRAGMENT_LOCATION_POINT + FRAGMENT_USER_DETAILS + FRAGMENT_PLACE_DETAILS
     response = query(session, qString)
     LOGGER.debug(f"getPetAllInfo: {response}")
     return response['data']['pet']
@@ -52,7 +52,7 @@ def getCurrentPetStats(session: requests.Session, petId: str):
     return response['data']['pet']
 
 def getCurrentPetRestStats(session: requests.Session, petId: str):
-    qString = QUERY_PET_REST.replace(VAR_PET_ID, petId) + FRAGMENT_REST_SUMMARY_DETAILS
+    qString = QUERY_PET_REST.replace(VAR_PET_ID, petId) + FRAGMENT_REST_FEED_DETAILS
     response = query(session, qString)
     LOGGER.debug(f"getCurrentPetStats: {response}")
     return response['data']['pet']
